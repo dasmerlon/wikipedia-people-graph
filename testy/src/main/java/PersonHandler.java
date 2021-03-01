@@ -15,7 +15,7 @@ public class PersonHandler extends DefaultHandler {
     private final List<Person> personList = new ArrayList<>();
     private StringBuilder characters;
 
-    private boolean isPerson;
+    private boolean isCategory;
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes)
@@ -36,14 +36,14 @@ public class PersonHandler extends DefaultHandler {
                 while (null != (line = reader.readLine())) {
                     line = line.trim();
 
-                    if (line.startsWith("[[Category:")) {
-                        isPerson = true;
+                    if (line.contains("[[Category:")) {
+                        isCategory = true;
                     }
-                    if (isPerson) {
+                    if (isCategory) {
                         if (line.startsWith("|NAME")) {
                             person.setName(line.replace("|NAME=", ""));
                         }
-                        if (line.startsWith("|GEBURTSDATUM")) {
+                        if (line.startsWith("[[Category:") && line.contains("")) {
                             person.setBirthDate(line.replace("|GEBURTSDATUM=", ""));
                         }
                         if (line.startsWith("|STERBEDATUM")) {
