@@ -43,10 +43,10 @@ public class PersonHandler extends DefaultHandler {
                         if (line.startsWith("|NAME")) {
                             person.setName(line.replace("|NAME=", ""));
                         }
-                        if (line.startsWith("[[Category:") && line.contains("")) {
+                        if (line.startsWith("[[Category:") && line.contains("births")) {
                             person.setBirthDate(line.replace("|GEBURTSDATUM=", ""));
                         }
-                        if (line.startsWith("|STERBEDATUM")) {
+                        if (line.startsWith("[[Category:") && line.contains("deaths")) {
                             person.setDeathDate(line.replace("|STERBEDATUM=", ""));
                         }
                     }
