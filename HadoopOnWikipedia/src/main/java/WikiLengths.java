@@ -1,4 +1,4 @@
-package gallery; /* you'll need to change this to match your package name */
+package HadoopOnWikipedia; /* you'll need to change this to match your package name */
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
