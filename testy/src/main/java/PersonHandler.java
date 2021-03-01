@@ -36,7 +36,7 @@ public class PersonHandler extends DefaultHandler {
                 while (null != (line = reader.readLine())) {
                     line = line.trim();
 
-                    if (line.startsWith("{{Normdaten|TYP=p")) {
+                    if (line.startsWith("[[Category:")) {
                         isPerson = true;
                     }
                     if (isPerson) {
