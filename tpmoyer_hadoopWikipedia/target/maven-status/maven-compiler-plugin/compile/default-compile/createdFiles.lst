@@ -1,9 +1,0 @@
-WikiLengths.class
-WikiLengthsReducer$redCounters.class
-XmlInputFormat$XmlRecordReader.class
-WikiLengthsMapper.class
-XmlInputFormat.class
-XmlInputFormatNoSpaces.class
-XmlInputFormatNoSpaces$XmlRecordReader.class
-WikiLengthsMapper$mapCounters.class
-WikiLengthsReducer.class
