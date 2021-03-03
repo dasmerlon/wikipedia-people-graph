@@ -11,11 +11,6 @@ public class PersonData {
         Configuration conf = new Configuration();
         conf.set("xmlinput.start", "<page>");
         conf.set("xmlinput.end", "</page>");
-        conf.set(
-                "io.serializations",
-                "org.apache.hadoop.io.serializer.JavaSerialization," +
-                        "org.apache.hadoop.io.serializer.WritableSerialization"
-        );
 
         Job job = Job.getInstance(conf, "persondata");
         job.setJarByClass(PersonData.class);

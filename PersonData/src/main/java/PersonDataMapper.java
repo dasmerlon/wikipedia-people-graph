@@ -1,7 +1,5 @@
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -11,31 +9,22 @@ import java.util.ArrayList;
 // Mapper <Input Key, Input Value, Output Key, Output Value>
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
-    private static final transient Logger logger = Logger.getLogger("Map");
+    private static final Logger logger = Logger.getLogger(PersonDataMapper.class);
 
     // Wir initialisieren den Output Key name und Output Value infos als leere Textobjekte.
     private Text name = new Text();
     private Text infos = new Text();
 
     /**
-     *
-     * @param key Erstmal irrelevant
-     * @param value Das XML der Page als Hadoops Text Class
+     * @param key     Erstmal irrelevant
+     * @param value   Das XML der Page als Hadoops Text Class
      * @param context Kontexte im Kontext Hadoops
      * @throws IOException
      * @throws InterruptedException
      */
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        logger.setLevel(Level.DEBUG);
-        logger.debug("penis");
-
-        if (0 == (context.getCounter(mapCounters.NUMPAGES)).getValue()) {
-            /* will use the inputSplit as the high order portion of the output key. */
-            FileSplit fileSplit = (FileSplit) context.getInputSplit();
-            Configuration cf = context.getConfiguration();
-            long blockSize = Integer.parseInt(cf.get("dfs.blocksize"));
-            context.getCounter(mapCounters.MAPID).increment(fileSplit.getStart() / blockSize);/* the base of this increment is 0 */
-        }
+        logger.setLevel(Level.WARN);
+        logger.info("starte hier");
 
         ArrayList<String> infoList = new ArrayList<>();
         // Wir speichern den Input Value als String page ab. Dieser String wird bei Zeilenumbrüchen
@@ -53,7 +42,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             if (line.startsWith("<title>")) {
                 String title = line.replace("<title>", "");
                 title = title.replace("</title>", "");
-                logger.debug("title: " + title);
+                logger.info("title: " + title);
                 name.set(title);
             }
             // Die Zeilen mit den Personeninformationen beginnen mit einem Pipesymbol. Daher prüfen wir,
@@ -68,31 +57,9 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             }
         }
         String information = String.join(", ", infoList);
-        logger.debug("information: " + information);
+        logger.info("information: " + information);
         infos.set(information);
 
-
-
-/*
-        int start = value.find("<title>", 0);
-        int end = value.find("</title>", start);
-        int advance = "<title>".length();
-
-        try {
-            String title = Text.decode(value.getBytes(), start+advance, end-start-advance);
-            name.set(title);
-        } catch (IOException e) {
-            System.out.println("IOException was " + e.getMessage());
-            return;
-        }
-
- */
-
         context.write(name, infos);
-
-
-        context.getCounter(mapCounters.NUMPAGES).increment(1);
     }
-
-    public enum mapCounters {NUMPAGES, MAPID}
 }
