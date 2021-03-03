@@ -53,13 +53,15 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 String[] info = line.split("=", 1);
                 String infoKey = info[0].trim();
                 String infoValue = info[1].trim();
-                infoList.add(infoKey + ": " + infoValue);
+                infos.set(infoKey + ": " + infoValue);
+                context.write(name, infos);
+                //infoList.add(infoKey + ": " + infoValue);
             }
         }
-        String information = String.join(", ", infoList);
-        logger.info("information: " + information);
-        infos.set(information);
+        //String information = String.join(", ", infoList);
+        //logger.info("information: " + information);
+        //infos.set(information);
 
-        context.write(name, infos);
+        //context.write(name, infos);
     }
 }
