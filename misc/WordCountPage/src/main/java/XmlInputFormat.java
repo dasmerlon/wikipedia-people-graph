@@ -1,5 +1,3 @@
-//package gallery; /* you'll need to change this to match your package name */
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
