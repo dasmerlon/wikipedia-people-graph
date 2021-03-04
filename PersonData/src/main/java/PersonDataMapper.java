@@ -4,7 +4,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 // Mapper <Input Key, Input Value, Output Key, Output Value>
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
@@ -26,6 +26,25 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         logger.setLevel(Level.WARN);
         logger.info("starte hier");
 
+        //+ description? lies weiter: https://en.wikipedia.org/wiki/name_name
+        ArrayList<String> persondata = new ArrayList<>(
+                Arrays.asList("name",
+                        "birth_date",
+                        "birth_place",
+                        "death_date",
+                        "death_place",
+                        "death_cause",
+                        "nationality",
+                        "spouse",
+                        "children",
+                        "education",
+                        "occupation",
+                        "order",
+                        "office",
+                        "term_start",
+                        "term_end",
+                        "party"
+                        ));
 
         ArrayList<String> infoList = new ArrayList<>();
         // Wir speichern den Input Value als String page ab. Dieser String wird bei Zeilenumbrüchen
@@ -46,6 +65,16 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 logger.info("title: " + title);
                 name.set(title);
             }
+            /*
+            //Short description
+            if (line.startsWith("<text") && line.contains("short description")) {
+                line = line.replace("{{short description|", "").replace("}}","");
+                String[] shortDesc = line.split(">",1);
+                String shortDescription = shortDesc[1].trim();
+                infoList.add("Short Description: " + shortDescription);
+            }
+             */
+
             // Die Zeilen mit den Personeninformationen beginnen mit einem Pipesymbol. Daher prüfen wir,
             // ob die Zeile mit einem Pipesymbol beginnt. Wenn dies der Fall ist, entfernen wir das Symbol
             // und splitten die Zeile beim Gleichzeichen.
@@ -57,9 +86,14 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 }
                 String infoKey = info[0].trim();
                 String infoValue = info[1].trim();
-                infos.set(infoKey + ": " + infoValue);
-                //context.write(name, infos);
-                infoList.add(infoKey + ": " + infoValue);
+                for (String data : persondata){
+                    // if (data.equals(infoKey) && !infoValue.isEmpty()) {
+                    if (data.equals(infoKey)) {
+                        //infos.set(infoKey + ": " + infoValue);
+                        //context.write(name, infos);
+                        infoList.add(infoKey + ": " + infoValue);
+                    }
+                }
             }
         }
         String information = String.join(", ", infoList);
