@@ -1,7 +1,5 @@
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -9,8 +7,6 @@ import java.util.regex.Pattern;
 
 // Mapper <Input Key, Input Value, Output Key, Output Value>
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
-
-    private static final Logger logger = Logger.getLogger(PersonDataMapper.class);
 
     // Wir initialisieren den Output Key name und Output Value infos als leere Textobjekte.
     private Text name = new Text();
@@ -24,8 +20,6 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
      * @throws InterruptedException
      */
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        logger.setLevel(Level.WARN);
-        logger.info("starte hier");
 
         //+ description? lies weiter: https://en.wikipedia.org/wiki/name_name
         ArrayList<String> persondata = new ArrayList<>(
@@ -63,14 +57,14 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             if (line.startsWith("<title>")) {
                 String title = line.replace("<title>", "");
                 title = title.replace("</title>", "");
-                logger.info("title: " + title);
-                name.set(title);
+                name.set(title + "<<<ENDTITLE<<<");
+                continue;
             }
 
             //Short description
-            else if (line.startsWith("<text") && line.contains("short description")) {
-                line = line.replace("{{short description|", "").replace("}}","");
-                String[] shortDesc = line.split(Pattern.quote(">"));
+            if (line.toLowerCase().contains("{{short description|")) {
+                line = line.replace("}}","");
+                String[] shortDesc = line.split(Pattern.quote("|"));
                 if (shortDesc.length < 2) {
                     continue;
                 }
@@ -79,35 +73,42 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 //}
                 String shortDescription = shortDesc[1].trim();
                 infoList.add("Short Description: " + shortDescription);
+                continue;
             }
 
             // Die Zeilen mit den Personeninformationen beginnen mit einem Pipesymbol. Daher prüfen wir,
             // ob die Zeile mit einem Pipesymbol beginnt. Wenn dies der Fall ist, entfernen wir das Symbol
             // und splitten die Zeile beim Gleichzeichen.
-            else if (line.startsWith("|") && line.contains("=")) {
-                line = line.replace("|", "");
-                String[] info = line.split(Pattern.quote("="));
-                if (info.length < 2) {
-                    continue;
-                }
-                String infoKey = info[0].trim();
-                String infoValue = info[1].trim();
-                for (String data : persondata){
-                    // if (data.equals(infoKey)) {
-                    if (data.equals(infoKey) && !infoValue.isEmpty()) {
-                        //infos.set(infoKey + ": " + infoValue);
-                        //context.write(name, infos);
-                        infoList.add(infoKey + ": " + infoValue);
+            for (String infoKey : persondata) {
+                if (line.contains("| " + infoKey) && line.contains("=")) {
+                    int position = line.indexOf("=");
+                    String infoValue = line.substring(position+1).trim();
+                    infoValue = parseInfoValue(infoKey, infoValue);
+                    if (infoValue == null) {
+                        continue;
                     }
+                    infoList.add(infoKey + ": " + infoValue);
                 }
             }
-        }
-        String information = String.join(", ", infoList);
-        logger.info("information: " + information);
-        infos.set(information);
 
-        // Uncomment this for the amount of lines for the current page
-        //infos.set(String.valueOf(lines.length));
+        }
+        String information = String.join(">>>NEXT>>>", infoList);
+        infos.set(information);
         context.write(name, infos);
     }
+
+
+    private String parseInfoValue(String infoKey, String infoValue) {
+        if (infoValue.isEmpty()) {
+            return null;
+        }
+        if (infoKey.equals("birth_date")) {
+            return infoValue;
+        } else if (infoKey.equals("death_date")) {
+            return infoValue;
+        }
+        return infoValue;
+    }
+
+
 }
