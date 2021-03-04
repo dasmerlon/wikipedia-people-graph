@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 // Mapper <Input Key, Input Value, Output Key, Output Value>
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
@@ -65,30 +66,35 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 logger.info("title: " + title);
                 name.set(title);
             }
-            /*
+
             //Short description
-            if (line.startsWith("<text") && line.contains("short description")) {
+            else if (line.startsWith("<text") && line.contains("short description")) {
                 line = line.replace("{{short description|", "").replace("}}","");
-                String[] shortDesc = line.split(">",1);
+                String[] shortDesc = line.split(Pattern.quote(">"));
+                if (shortDesc.length < 2) {
+                    continue;
+                }
+                //if (shortDesc[1].isEmpty()) {
+                //    shortDesc[1] = shortDesc[1] + "None";
+                //}
                 String shortDescription = shortDesc[1].trim();
                 infoList.add("Short Description: " + shortDescription);
             }
-             */
 
             // Die Zeilen mit den Personeninformationen beginnen mit einem Pipesymbol. Daher prüfen wir,
             // ob die Zeile mit einem Pipesymbol beginnt. Wenn dies der Fall ist, entfernen wir das Symbol
             // und splitten die Zeile beim Gleichzeichen.
             else if (line.startsWith("|") && line.contains("=")) {
                 line = line.replace("|", "");
-                String[] info = line.split("=", 1);
+                String[] info = line.split(Pattern.quote("="));
                 if (info.length < 2) {
                     continue;
                 }
                 String infoKey = info[0].trim();
                 String infoValue = info[1].trim();
                 for (String data : persondata){
-                    // if (data.equals(infoKey) && !infoValue.isEmpty()) {
-                    if (data.equals(infoKey)) {
+                    // if (data.equals(infoKey)) {
+                    if (data.equals(infoKey) && !infoValue.isEmpty()) {
                         //infos.set(infoKey + ": " + infoValue);
                         //context.write(name, infos);
                         infoList.add(infoKey + ": " + infoValue);
