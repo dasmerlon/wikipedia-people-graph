@@ -12,7 +12,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
     private static final Logger logger = Logger.getLogger(PersonDataMapper.class);
 
     // Wir initialisieren den Output Key name und Output Value infos als leere Textobjekte.
-    private Text name = new Text("dies ist ein key");
+    private Text name = new Text();
     private Text infos = new Text();
 
     /**

@@ -32,7 +32,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         // gesplittet, damit wir später über die Zeilen iterieren können.
         String page = value.toString();
         String[] lines = page.split("\\r?\\n");
-        String regex = "/\\[\\[\\w*Category\\w*\\W\\d{4}\\s\\w*births\\w*\\]\\](.*)/m";
+        String regex = "(.*)\\d{4}\\sbirths]]";
 
 
         // Wir iterieren über alle Zeilen der Wikiseite und entfernen zunächst alle Leerzeichen am
@@ -46,7 +46,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
             //if (line.startsWith("[[Category:") && line.endsWith("births]]")) {
 
-            if (line.matches(regex)) {
+            if (line.startsWith("[[Category:") && line.matches(regex)) {
                 infos.set(page);
                 context.write(name ,infos);
             }
