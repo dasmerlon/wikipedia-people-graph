@@ -17,7 +17,7 @@ public class PersonData {
 
         job.setMapperClass(PersonDataMapper.class);
         job.setReducerClass(PersonDataReducer.class);
-        //job.setNumReduceTasks(0);
+        job.setNumReduceTasks(0);
         job.setInputFormatClass(XmlInputFormat.class);
 
         job.setOutputKeyClass(Text.class);

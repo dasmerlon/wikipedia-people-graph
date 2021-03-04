@@ -29,7 +29,6 @@ public class XmlInputFormat extends TextInputFormat {
 
     @Override
     public RecordReader<LongWritable, Text> createRecordReader(InputSplit is, TaskAttemptContext tac) {
-        /**/
         logger.setLevel(Level.DEBUG);
         return new XmlRecordReader();
     }
@@ -43,12 +42,11 @@ public class XmlInputFormat extends TextInputFormat {
         private DataOutputBuffer buffer = new DataOutputBuffer();
         private LongWritable key = new LongWritable();
         private Text value = new Text();
-        private boolean denyLeadingSpaces;
         private CompressionCodecFactory compressionCodecs = null;
         private char space = ' ';
 
         @Override
-        public void initialize(InputSplit is, TaskAttemptContext tac) throws IOException, InterruptedException {
+        public void initialize(InputSplit is, TaskAttemptContext tac) throws IOException {
             FileSplit fileSplit = (FileSplit) is;
             startTag = tac.getConfiguration().get(START_TAG_KEY).getBytes("utf-8");
             endTag = tac.getConfiguration().get(END_TAG_KEY).getBytes("utf-8");
@@ -79,23 +77,17 @@ public class XmlInputFormat extends TextInputFormat {
         }
 
         @Override
-        public boolean nextKeyValue() throws IOException, InterruptedException {
-            //logger.debug("XRR83^  "+fsin.getPos());
+        public boolean nextKeyValue() throws IOException {
             if (fsin.getPos() < end) {
                 if (readUntilMatch(startTag, false)) {
-                    //logger.debug("XRR86^  "+fsin.getPos());
                     key.set(fsin.getPos() - startTag.length);
                     try {
                         buffer.write(startTag);
-                        denyLeadingSpaces = true;
                         if (readUntilMatch(endTag, true)) {
                             value.set(buffer.getData(), 0, buffer.getLength());
-                            //logger.debug("XRR93^key="+key.get()+" value="+value.toString());
                             return true;
                         } else if (0 != buffer.getLength()) {
-                            logger.debug("false= readUntilMatch but buffer not 0length.  This will show only for xmlinput.start with no xmlinput.end tags");
                             value.set(buffer.getData(), 0, buffer.getLength());
-                            //logger.debug("XRR98^K="+key.get()+" V="+value.toString());
                             return true;
                         }
                     } finally {
@@ -130,60 +122,33 @@ public class XmlInputFormat extends TextInputFormat {
         }
 
         private boolean readUntilMatch(byte[] match, boolean withinBlock) throws IOException {
-            /* this is where the magic of the hadoop FileSystem class comes in... if this does not
-             * see    match    within the current inputSplit, it will continue to fsin.read() bytes
-             * into the next inputsplit.
-             */
-            //logger.debug("cme@ readUntillMatch starting at "+fsin.getPos());
             int i = 0;
-            int lastB = 0;
             while (true) {
+                // This is the current byte we're looking at.
+                // Sorry for the name.
                 int b = fsin.read();
-                /* Used to look at a 64MB input slice off the decompressed wikipedia
-                 *  dump (latest version of pages only ( the 9GB one)).  The logger section below
-                 *  shows the two readUntilMatch behaviors.  First behavior is seen at the end of
-                 *  mapper-the-first.  It has been called with match==xmlinput.end   It continues
-                 *  reading past the file-split in log file                  !!! yourjobIdBelowHere         !!!
-                 *  http://localhost.localdomain:50060/tasklog?attemptid=attempt_201310220813_0030_m_000000_0&all=true
-                 *  The second behavior is when readUntilMatch is called with match==the xmlinput.start
-                 *  at the beginning of the map-00001 (second input split).
-                 *  http://localhost.localdomain:50060/tasklog?attemptid=attempt_201310220813_0030_m_000001_0&all=true
-                 *  By reading up to the xmlinput.start it ignores the partial page "overRead" by mapper-just-prior
-                 */
-//				if(  (fsin.getPos()>=67108864) /* the beginning of split the second */
-//					&&(fsin.getPos()<=67158079) /* for the version of wikipedia I grabbed, bendodiazapine started at byte 67042129 and ended at 67157331 (spanning the 0th and 1st input splits)*/
-//				 ){
-//					/**/logger.debug(String.format("%10d byte=%3d %c",fsin.getPos(),b,(char)b)); /* mapper log gets 1 line per inputfile byte */
-//				}
 
-                if (b == -1) return false; /* end of file */
-                denyLeadingSpaces = ((denyLeadingSpaces && (32 == b)) || (10 == b) || (13 == b)) ? true : false;
+                // This is the last byte of the file.
+                // Return false, since we couldn't find a match before the file ended.
+                if (b == -1) return false;
 
-                // save to buffer:
+                // Save the current byte to the buffer
                 if (withinBlock) {
-                    if ((b != 10)
-                            && (b != 13)
-                            && (b != 9)
-                            && ((b != 32) || (false == denyLeadingSpaces) || (lastB != 32))
-                    ) {
-                        buffer.write(b);
-                        lastB = b;
-                    } else if ((b == 10)
-                            || (b == 13)
-                            || (b == 9)
-                    ) {
-                        buffer.write(space);
-                        lastB = 32;
-                    }
+                    // This block only writes the current byte, if
+                    buffer.write(b);
                 }
-                // check if we're matching:
+
+                // Check byte for byte, if we're matching the given "match" byte String.
                 if (b == match[i]) {
                     i++;
-                    if (i >= match.length) return true;
-                } else
+                    // The amount of matched characters is the amount of the word we're looking for.
+                    if (i == match.length) return true;
+                } else {
+                    // The next character didn't match. Start looking from the beginning.
                     i = 0;
+                }
 
-                // see if we've passed the stop point:
+                // See if we've passed the stop point:
                 if (!withinBlock && i == 0 && fsin.getPos() >= end) return false;
             }
         }
