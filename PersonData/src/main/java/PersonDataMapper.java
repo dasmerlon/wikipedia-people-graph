@@ -2,7 +2,13 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
-import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Mapper <Input Key, Input Value, Output Key, Output Value>
@@ -22,24 +28,25 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
         //+ description? lies weiter: https://en.wikipedia.org/wiki/name_name
-        ArrayList<String> persondata = new ArrayList<>(
-                Arrays.asList("name",
-                        "birth_date",
-                        "birth_place",
-                        "death_date",
-                        "death_place",
-                        "death_cause",
-                        "nationality",
-                        "spouse",
-                        "children",
-                        "education",
-                        "occupation",
-                        "order",
-                        "office",
-                        "term_start",
-                        "term_end",
-                        "party"
-                        ));
+        String[] persondata = {
+                "image ",
+                "name ",
+                "birth_date ",
+                "birth_place ",
+                "death_date ",
+                "death_place ",
+                "death_cause ",
+                "nationality ",
+                "spouse ",
+                "children ",
+                "education ",
+                "occupation ",
+                "order ",
+                "office ",
+                "term_start ",
+                "term_end ",
+                "party "
+        };
 
         ArrayList<String> infoList = new ArrayList<>();
         // Wir speichern den Input Value als String page ab. Dieser String wird bei Zeilenumbrüchen
@@ -63,7 +70,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
             //Short description
             if (line.toLowerCase().contains("{{short description|")) {
-                line = line.replace("}}","");
+                line = line.replace("}}", "");
                 String[] shortDesc = line.split(Pattern.quote("|"));
                 if (shortDesc.length < 2) {
                     continue;
@@ -80,14 +87,14 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             // ob die Zeile mit einem Pipesymbol beginnt. Wenn dies der Fall ist, entfernen wir das Symbol
             // und splitten die Zeile beim Gleichzeichen.
             for (String infoKey : persondata) {
-                if (line.contains("| " + infoKey) && line.contains("=")) {
+                if ((line.contains("| " + infoKey) || line.contains("|" + infoKey)) && line.contains("=")) {
                     int position = line.indexOf("=");
-                    String infoValue = line.substring(position+1).trim();
+                    String infoValue = line.substring(position + 1).trim();
                     infoValue = parseInfoValue(infoKey, infoValue);
                     if (infoValue == null) {
                         continue;
                     }
-                    infoList.add(infoKey + ": " + infoValue);
+                    infoList.add(infoKey.trim() + ": " + infoValue);
                 }
             }
 
@@ -99,15 +106,66 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
 
     private String parseInfoValue(String infoKey, String infoValue) {
-        if (infoValue.isEmpty()) {
+        if (infoValue == null || infoValue.isEmpty()) {
             return null;
-        }
-        if (infoKey.equals("birth_date")) {
-            return infoValue;
-        } else if (infoKey.equals("death_date")) {
+        } else if (infoKey.equals("image ")) {
+            infoValue = infoValue.replaceAll("\\s", "_");
+            return "https://commons.wikimedia.org/wiki/Special:FilePath/" + infoValue;
+        } else if (infoKey.equals("birth_date ") || infoKey.equals("death_date ")) {
+            infoValue = extractSubstring(infoValue, "(\\d{1,4}\\|\\d{1,2}\\|\\d{1,2})");
+            return dateFormatter(infoValue);
+            /*
+            String[] unit = infoValue.split("\\|");
+            int year = Integer.parseInt(unit[0]);
+            int month = Integer.parseInt(unit[1]);
+            int day = Integer.parseInt(unit[2]);
+            LocalDate date = LocalDate.of(year, month, day);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return date.format(formatter);
+             */
+        } else if (infoKey.equals("term_start ") || infoKey.equals("term_end ")) {
+            return dateFormatter(infoValue);
+        } else if (infoKey.equals("birth_place ")) {
+
             return infoValue;
         }
         return infoValue;
+    }
+
+    private String extractSubstring(String text, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
+        if (!matcher.find()) {
+            return null;
+        }
+        return text.substring(matcher.start(), matcher.end());
+    }
+
+    private String dateFormatter(String date) {
+        if (date == null || date.isEmpty()) {
+            return null;
+        }
+        // unser Output Dateformat
+        SimpleDateFormat formatter = new SimpleDateFormat("y-MM-dd");
+        String[] patternList = {
+                "d MMM y",
+                "MMM d, y",
+                "dd MMM y",
+                "MMM dd, y",
+                "y|M|d",
+                "y|MM|d",
+                "y|M|dd",
+                "y|MM|dd"
+        };
+
+        for (String pattern : patternList) {
+            SimpleDateFormat parser = new SimpleDateFormat(pattern);
+            try {
+                Date parsedDate = parser.parse(date);
+                return formatter.format(parsedDate);
+            } catch (ParseException ignored) {}
+        }
+        return null;
     }
 
 
