@@ -20,7 +20,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
     /**
      * @param key     Erstmal irrelevant
-     * @param value   Das XML der Page als Hadoops Text Class
+     * @param value   Das XML der Personenpage als Hadoops Text Class
      * @param context Kontexte im Kontext Hadoops
      * @throws IOException
      * @throws InterruptedException
@@ -28,19 +28,23 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
         //+ description? lies weiter: https://en.wikipedia.org/wiki/name_name
+
+        // Das String Array persondata enthält alle Informationen zu der Person, die wir erhalten wollen.
+        // Später iterieren wir über die Zeilen und suchen nach diesen Informationen.
         String[] persondata = {
                 "image ",
                 "name ",
+                "birth_name ",
+                "other_names ",
                 "birth_date ",
                 "birth_place ",
                 "death_date ",
                 "death_place ",
                 "death_cause ",
                 "nationality ",
-                "spouse ",
-                "children ",
                 "education ",
                 "occupation ",
+                "known_for ",
                 "order ",
                 "office ",
                 "term_start ",
@@ -108,26 +112,21 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
     private String parseInfoValue(String infoKey, String infoValue) {
         if (infoValue == null || infoValue.isEmpty()) {
             return null;
-        } else if (infoKey.equals("image ")) {
-            infoValue = infoValue.replaceAll("\\s", "_");
-            return "https://commons.wikimedia.org/wiki/Special:FilePath/" + infoValue;
-        } else if (infoKey.equals("birth_date ") || infoKey.equals("death_date ")) {
-            infoValue = extractSubstring(infoValue, "(\\d{1,4}\\|\\d{1,2}\\|\\d{1,2})");
-            return dateFormatter(infoValue);
-            /*
-            String[] unit = infoValue.split("\\|");
-            int year = Integer.parseInt(unit[0]);
-            int month = Integer.parseInt(unit[1]);
-            int day = Integer.parseInt(unit[2]);
-            LocalDate date = LocalDate.of(year, month, day);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            return date.format(formatter);
-             */
-        } else if (infoKey.equals("term_start ") || infoKey.equals("term_end ")) {
-            return dateFormatter(infoValue);
-        } else if (infoKey.equals("birth_place ")) {
+        }
 
-            return infoValue;
+        switch (infoKey) {
+            case "image ":
+                infoValue = infoValue.replaceAll("\\s", "_");
+                return "https://commons.wikimedia.org/wiki/Special:FilePath/" + infoValue;
+            case "birth_date ":
+            case "death_date ":
+                infoValue = extractSubstring(infoValue, "(\\d{1,4}\\|\\d{1,2}\\|\\d{1,2})");
+                return dateFormatter(infoValue);
+            case "term_start ":
+            case "term_end ":
+                return dateFormatter(infoValue);
+            case "birth_place ":
+                return infoValue;
         }
         return infoValue;
     }
