@@ -16,15 +16,16 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
- * Reads records that are delimited by a specifc begin/end tag.
- * Correctly handles case where xmlinput.start and xmlinput.end span
+ * Reads records that are delimited by a specific begin/end tag.
+ * Correctly handles case where xmlInput.start and xmlInput.end span
  * the boundary between inputSplits
  */
 public class XmlInputFormat extends TextInputFormat {
-    public static final String START_TAG_KEY = "xmlinput.start";
-    public static final String END_TAG_KEY = "xmlinput.end";
+    public static final String START_TAG_KEY = "xmlInput.start";
+    public static final String END_TAG_KEY = "xmlInput.end";
     private static final transient Logger logger = Logger.getLogger("Map");
 
     @Override
@@ -38,49 +39,37 @@ public class XmlInputFormat extends TextInputFormat {
         private byte[] endTag;
         private long start;
         private long end;
-        private FSDataInputStream fsin;
-        private DataOutputBuffer buffer = new DataOutputBuffer();
-        private LongWritable key = new LongWritable();
-        private Text value = new Text();
-        private CompressionCodecFactory compressionCodecs = null;
-        private char space = ' ';
+        private FSDataInputStream fsInput;
+        private final DataOutputBuffer buffer = new DataOutputBuffer();
+        private final LongWritable key = new LongWritable();
+        private final Text value = new Text();
 
         @Override
         public void initialize(InputSplit is, TaskAttemptContext tac) throws IOException {
             FileSplit fileSplit = (FileSplit) is;
-            startTag = tac.getConfiguration().get(START_TAG_KEY).getBytes("utf-8");
-            endTag = tac.getConfiguration().get(END_TAG_KEY).getBytes("utf-8");
+            startTag = tac.getConfiguration().get(START_TAG_KEY).getBytes(StandardCharsets.UTF_8);
+            endTag = tac.getConfiguration().get(END_TAG_KEY).getBytes(StandardCharsets.UTF_8);
 
             start = fileSplit.getStart();
             end = start + fileSplit.getLength();
 
-//	        this.fileSplit = (FileSplit) split;
-//	        this.conf = context.getConfiguration();
-//
-//	        final Path file = fileSplit.getPath();
-//	        compressionCodecs = new CompressionCodecFactory(conf);
-//
-//	        final CompressionCodec codec = compressionCodecs.getCodec(file);
-//	        System.out.println(codec);
-//	        FileSystem fs = file.getFileSystem(conf);
-
             Path file = fileSplit.getPath();
             Configuration conf = tac.getConfiguration();
-            compressionCodecs = new CompressionCodecFactory(conf);
+            CompressionCodecFactory compressionCodecs = new CompressionCodecFactory(conf);
             final CompressionCodec codec = compressionCodecs.getCodec(file);
             logger.debug("codec seen as " + codec);
 
             FileSystem fs = file.getFileSystem(conf);
-            fsin = fs.open(fileSplit.getPath());
-            fsin.seek(start);
-            logger.debug("see first location of the start as " + fsin.getPos());
+            fsInput = fs.open(fileSplit.getPath());
+            fsInput.seek(start);
+            logger.debug("see first location of the start as " + fsInput.getPos());
         }
 
         @Override
         public boolean nextKeyValue() throws IOException {
-            if (fsin.getPos() < end) {
+            if (fsInput.getPos() < end) {
                 if (readUntilMatch(startTag, false)) {
-                    key.set(fsin.getPos() - startTag.length);
+                    key.set(fsInput.getPos() - startTag.length);
                     try {
                         buffer.write(startTag);
                         if (readUntilMatch(endTag, true)) {
@@ -101,24 +90,23 @@ public class XmlInputFormat extends TextInputFormat {
         }
 
         @Override
-        public LongWritable getCurrentKey() throws IOException,
-                InterruptedException {
+        public LongWritable getCurrentKey() {
             return key;
         }
 
         @Override
-        public Text getCurrentValue() throws IOException, InterruptedException {
+        public Text getCurrentValue() {
             return value;
         }
 
         @Override
-        public float getProgress() throws IOException, InterruptedException {
-            return (fsin.getPos() - start) / (float) (end - start);
+        public float getProgress() throws IOException {
+            return (fsInput.getPos() - start) / (float) (end - start);
         }
 
         @Override
         public void close() throws IOException {
-            fsin.close();
+            fsInput.close();
         }
 
         private boolean readUntilMatch(byte[] match, boolean withinBlock) throws IOException {
@@ -126,7 +114,7 @@ public class XmlInputFormat extends TextInputFormat {
             while (true) {
                 // This is the current byte we're looking at.
                 // Sorry for the name.
-                int b = fsin.read();
+                int b = fsInput.read();
 
                 // This is the last byte of the file.
                 // Return false, since we couldn't find a match before the file ended.
@@ -149,7 +137,7 @@ public class XmlInputFormat extends TextInputFormat {
                 }
 
                 // See if we've passed the stop point:
-                if (!withinBlock && i == 0 && fsin.getPos() >= end) return false;
+                if (!withinBlock && i == 0 && fsInput.getPos() >= end) return false;
             }
         }
     }
