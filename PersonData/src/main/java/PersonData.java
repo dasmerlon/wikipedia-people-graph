@@ -6,17 +6,21 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 /**
- * PersonData erzeugt ein Map-Only Job, der aus Personenartikel von Wikipedia
- * den Artikelnamen und ausgewählte Informationen zu der Person ausgibt.
- * Die PersonData Klasse richtet die Konfiguration für den Map-Only Job ein,
- * damit dieser in Hadoop ausgeführt werden kann.
+ * Die Klasse PersonData erzeugt ein Map-Only Job, der aus Personenartikel von Wikipedia den Artikelnamen
+ * und ausgewählte Informationen zu der Person ausgibt. Der Map-Only Job erwartet einen Wikipedia-Dumb als
+ * XML-Datei, der nur Personenartikel enthält. Dafür kann das Projekt PersonArticleExtractor verwendet werden.
+ * <p>
+ * Der Output enthält in jeder Zeile die Daten zu einer Person. Dabei wird erst der Titel gefolgt von dem
+ * Delimiter <<<ENDTITLE<<< angegeben und anschließend eine Reihe an Informationen, die voneinander
+ * durch den Delimiter >>>NEXT>>> getrennt sind.
  */
 public class PersonData {
 
     /**
-     * In dieser Methode geben wir die Konfigurationen, den Jobnamen, den Datentyp von
+     * Die main Methode richtet die Konfiguration für den Map-Only Job ein, damit dieser in Hadoop
+     * ausgeführt werden kann. Wir geben dafür die Konfigurationen, den Jobnamen, den Datentyp von
      * dem Output Key und Output Value, den Datentyp der Ein- und Ausgabe und die Klassennamen des
-     * Mappers und des Input-Formats an.
+     * Mappers und des Input-Formats an. Außerdem legen wir hier fest, dass es keinen Reduce Job gibt.
      */
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();

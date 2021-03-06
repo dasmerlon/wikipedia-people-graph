@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * Dies ist eine gekürzte Version des XmlInputFormats von Thomas P. Moyer:
+ * https://tpmoyer-gallery.appspot.com/hadoopWikipedia
+ * Wir benutzen dieses InputFormat, damit der Mapper immer einen kompletten und unveränderten
+ * Wikipediaartikel übergeben bekommt.
+ * <p>
  * Reads records that are delimited by a specific begin/end tag.
  * Correctly handles case where xmlInput.start and xmlInput.end span
  * the boundary between inputSplits
@@ -35,14 +40,14 @@ public class XmlInputFormat extends TextInputFormat {
     }
 
     public static class XmlRecordReader extends RecordReader<LongWritable, Text> {
+        private final DataOutputBuffer buffer = new DataOutputBuffer();
+        private final LongWritable key = new LongWritable();
+        private final Text value = new Text();
         private byte[] startTag;
         private byte[] endTag;
         private long start;
         private long end;
         private FSDataInputStream fsInput;
-        private final DataOutputBuffer buffer = new DataOutputBuffer();
-        private final LongWritable key = new LongWritable();
-        private final Text value = new Text();
 
         @Override
         public void initialize(InputSplit is, TaskAttemptContext tac) throws IOException {
