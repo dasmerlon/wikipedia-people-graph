@@ -33,7 +33,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         String page = value.toString();
         String[] lines = page.split("\\r?\\n");
         String categoryRegex = "(.*)\\d{1,4}\\sbirths]]";
-        String referenceRegex = "(\\&lt\\;ref[\\s\\S]*?\\&lt\\;\\/ref\\&gt\\;)|(\\{\\{sfn\\|[\\s\\S]*?\\}\\})";
+        String referenceRegex = "(\\&lt\\;ref[\\s\\S]*?\\&lt\\;\\/ref\\&gt\\;)|(\\{\\{sfn[\\s\\S]*?\\}\\})";
         String commentRegex = "(\\&lt\\;\\!--[\\s\\S]*?--\\&gt\\;)";
         String filterRegex = referenceRegex+ "|" + commentRegex;
 

@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>wikipedia-people-graph</groupId>
-    <artifactId>PersonData</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>PersonArticle</artifactId>
+    <version>1</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

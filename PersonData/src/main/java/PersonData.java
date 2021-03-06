@@ -7,7 +7,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 /**
  * Die Klasse PersonData erzeugt ein Map-Only Job, der aus Personenartikel von Wikipedia den Artikelnamen
- * und ausgewählte Informationen zu der Person ausgibt. Der Map-Only Job erwartet einen Wikipedia-Dumb als
+ * und ausgewählte Informationen zu der Person ausgibt. Der Map-Only Job erwartet einen Wikipedia-Dump als
  * XML-Datei, der nur Personenartikel enthält. Dafür kann das Projekt PersonArticleExtractor verwendet werden.
  * <p>
  * Der Output enthält in jeder Zeile die Daten zu einer Person. Dabei wird erst der Titel gefolgt von dem

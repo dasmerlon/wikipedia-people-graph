@@ -7,6 +7,8 @@
 #     HostName basecpu1.informatik.uni-hamburg.de
 #     IdentityFile ~/.ssh/id_rsa
 
-scp target/PersonData-1.0-SNAPSHOT.jar basecpu1:~/jars/test.jar
-ssh basecpu1 'hadoop fs -rm -r testicle'
-ssh basecpu1 'hadoop jar jars/test.jar /user/7mhoffma/Test_osteron/test.xml testicle loglevel debug'
+scp target/PersonArticle-1.jar basecpu1:~/jars/PersonArticle.jar
+ssh basecpu1 'hadoop fs -rm -r test/jars/PersonArticle.jar'
+ssh basecpu1 'hadoop fs -rm -r test/output/PersonArticle'
+ssh basecpu1 'hadoop fs -copyFromLocal jars/PersonArticle.jar test/jars/PersonArticle.jar'
+ssh basecpu1 'hadoop jar jars/PersonArticle.jar /user/7mhoffma/test/data/wikipages.xml test/output/PersonArticle loglevel debug'
