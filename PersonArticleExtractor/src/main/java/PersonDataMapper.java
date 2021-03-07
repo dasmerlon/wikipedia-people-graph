@@ -4,14 +4,16 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // Mapper <Input Key, Input Value, Output Key, Output Value>
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
-    private static final Logger logger = Logger.getLogger(PersonDataMapper.class);
 
-    // Wir initialisieren den Output Key name und Output Value infos als leere Textobjekte.
     private Text name = new Text();
     private Text infos = new Text();
 
@@ -23,43 +25,52 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
      * @throws InterruptedException
      */
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        logger.setLevel(Level.WARN);
-        logger.info("starte hier");
 
-
-        ArrayList<String> infoList = new ArrayList<>();
-        // Wir speichern den Input Value als String page ab. Dieser String wird bei Zeilenumbrüchen
-        // gesplittet, damit wir später über die Zeilen iterieren können.
         String page = value.toString();
         String[] lines = page.split("\\r?\\n");
-        String categoryRegex = "(.*)\\d{1,4}\\sbirths]]";
-        String referenceRegex = "(\\&lt\\;ref[\\s\\S]*?\\&lt\\;\\/ref\\&gt\\;)|(\\{\\{sfn[\\s\\S]*?\\}\\})";
+        String categoryRegex = "(.*)\\d{1,4}(\\sBC\\s|\\s)births]]";
+        String referenceRegex = "(\\&lt\\;ref[\\s\\S]*?\\&lt\\;\\/ref\\&gt\\;)|(\\{\\{(sfn|efn)[\\s\\S]*?\\}\\})";
         String commentRegex = "(\\&lt\\;\\!--[\\s\\S]*?--\\&gt\\;)";
-        String filterRegex = referenceRegex+ "|" + commentRegex;
 
-
-        // Wir iterieren über alle Zeilen der Wikiseite und entfernen zunächst alle Leerzeichen am
-        // Anfang und am Ende. Danach werden die Zeilen überprüft, ob sie den Titel oder eine
-        // Personeninformation enthalten.
         for (String line : lines) {
             line = line.trim();
-            // Der Titel von Personenartikeln enthält den Namen und gegebenenfalls eine eindeutige
-            // Beschreibung. Wir prüfen also, ob die Zeile den Titel enthält und übergeben diesen als
-            // Output Key, nachdem wir das XML aus der Zeile entfernt haben.
-
-            //if (line.startsWith("[[Category:") && line.endsWith("births]]")) {
 
             if (line.startsWith("[[Category:") && line.matches(categoryRegex)) {
-                page = page.replaceAll(filterRegex, "").trim();
+                page = page.replaceAll(referenceRegex+ "|" + commentRegex, "").trim();
+                page = htmlDecoder(page);
                 infos.set(page);
                 context.write(name ,infos);
             }
-
         }
-        return;
 
         // Uncomment this for the amount of lines for the current page
         //infos.set(String.valueOf(lines.length));
         //context.write(name, infos);
+    }
+
+
+    private String htmlDecoder(String page) {
+        page = page.replace("&amp", "&");
+
+        Map<String, Character> htmlMapping = new HashMap<>();
+        htmlMapping.put("&lt;", '<');
+        htmlMapping.put("&gt;", '>');
+        htmlMapping.put("&quot;", '"');
+        htmlMapping.put("&mdash;", '—');
+        htmlMapping.put("&ensp;", ' ');
+        htmlMapping.put("&emsp;", ' ');
+        htmlMapping.put("&thinsp;", ' ');
+        htmlMapping.put("&nbsp;", ' '); //" "
+        htmlMapping.put("&ndash;", '-'); //-
+        htmlMapping.put("&amp;", '&');
+
+        for (Map.Entry<String, Character> entry : htmlMapping.entrySet()) {
+            String hashKey = entry.getKey();
+            Character hashValue = entry.getValue();
+            String lol = Character.toString(hashValue);
+            page = page.replace(hashKey, lol);
+        }
+
+        return page;
     }
 }
