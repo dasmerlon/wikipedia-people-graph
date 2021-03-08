@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
  * den Titel (Output Key) und bestimmte Personeninformationen (Output Value) extrahiert.
  */
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
+    //TODO: Reduce Job, der doppelte Infos entfernt. Behalten: das 1.
 
     private final Text name = new Text();
     private final Text infos = new Text();
@@ -32,30 +33,27 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
      * @throws InterruptedException if thread were interrupted, either before or during the activity
      */
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        //TODO: evtl. description mit Wikilink? https://en.wikipedia.org/wiki/name_name
 
         // Das String-Array personData enthält die Informationen einer Person, die wir aus der
-        // Wikipedia-Infobox erhalten wollen. Das Leerzeichen am Ende schließt ungewollte Matches aus,
-        // wie zb. "image1".
+        // Wikipedia-Infobox erhalten wollen.
         String[] personData = {
-                "image ",
-                "name ",
-                "birth_name ",
-                "other_names ",
-                "birth_date ",
-                "birth_place ",
-                "death_date ",
-                "death_place ",
-                "death_cause ",
-                "nationality ",
-                "education ",
-                "occupation ",
-                "known_for ",
-                "order ",
-                "office ",
-                "term_start ",
-                "term_end ",
-                "party "
+                "image",
+                "name",
+                "birth_name",
+                "birth_date",
+                "birth_place",
+                "death_date",
+                "death_place",
+                "death_cause",
+                "nationality",
+                "education",
+                "occupation",
+                "known_for",
+                "order",
+                "office",
+                "term_start",
+                "term_end",
+                "party"
         };
 
         // Wir speichern den Input Value als String page ab. Dieser String wird bei Zeilenumbrüchen
@@ -79,6 +77,11 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 String title = line.replace("<title>", "");
                 title = title.replace("</title>", "");
                 name.set(title + "<<<ENDTITLE<<<");
+
+                // Wir ersetzen alle Leerzeichen durch Underscores und hängen ihn an einen URL-Anfang.
+                // Die dadurch entstehende URL ist die URL des Wikipediaartikels.
+                String urlEnd = title.replaceAll("\\s", "_");
+                infoList.add("URL: " + "https://en.wikipedia.org/wiki/" + urlEnd);
                 continue;
             }
 
@@ -93,25 +96,36 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 if (shortDesc.length < 2) {
                     continue;
                 }
-                infoList.add("Short Description: " + shortDesc[1].trim());
+                String description = curvedBracketTest(shortDesc[1]);
+                if (description == null || description.isEmpty()) {
+                    continue;
+                }
+                infoList.add("Short Description: " + description.trim());
                 continue;
             }
 
-            // Die Personeninformationen stehen nach einem Pipe-Symbol und enthalten ein Gleichheitszeichen.
-            // Meistens beginnt die Zeile mit dem Pipe-Symbol, aber nicht immer. Zwischen dem Pipe-Symbol und
-            // dem InfoKey ist manchmal ein Leerzeichen. Wir finden die Position des ersten Gleichheitszeichens
-            // und speichern den Substring nach dem Gleich als InfoValue. Der InfoValue wird mithilfe der
-            // Methode parseInfoValue bearbeitet und anschließend zusammen mit dem InfoKey zu der infoList
-            // hinzugefügt.
+            // Die Art der Personeninformation steht zwischen einem Pipe-Symbol und einem Gleichheitszeichen.
+            // Zwischen dem InfoKey und dem Pipe-Symbol und dem InfoKey und dem Gleichheitszeichen
+            // kann manchmal ein Leerzeichen sein. Wir müssen diese Fälle überprüfen, um ungewollte
+            // Informationen auszuschließen, wie zb. "image1".
+            // Danach finden wird die Position des ersten Gleichheitszeichens und speichern den Substring
+            // nach dem Gleich als InfoValue. Der InfoValue wird mithilfe der Methode parseInfoValue
+            // bearbeitet und anschließend zusammen mit dem InfoKey zu der infoList hinzugefügt.
             for (String infoKey : personData) {
-                if ((line.contains("| " + infoKey) || line.contains("|" + infoKey)) && line.contains("=")) {
+                Boolean spaces = line.startsWith("| " + infoKey + " ");
+                Boolean noSpaces = line.startsWith("|" + infoKey + "=");
+                Boolean StartSpace = line.startsWith("| " + infoKey + "=");
+                Boolean endSpace = line.startsWith("|" + infoKey + " ");
+
+                if ((spaces || noSpaces || StartSpace || endSpace) && line.contains("=")) {
                     int position = line.indexOf("=");
                     String infoValue = line.substring(position + 1).trim();
                     infoValue = parseInfoValue(infoKey, infoValue);
-                    if (infoValue == null) {
+                    infoValue = curvedBracketTest(infoValue);
+                    if (infoValue == null || infoValue.isEmpty()) {
                         continue;
                     }
-                    infoList.add(infoKey.trim() + ": " + infoValue);
+                    infoList.add(infoKey.trim() + ": " + infoValue.trim());
                 }
             }
         }
@@ -138,31 +152,88 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             return null;
         }
 
+        // Wenn der Inhalt von infoValue eine Plain- oder Flatlist ist, stehen die eigentlichen Informationen
+        // in den Zeilen danach. Daher ignorieren wir diese Information.
+        String[] listNames = {
+                "plainlist",
+                "flatlist",
+                "ublist",
+                "flat list",
+                "plain list",
+                "flagicon"
+        };
+
+        for (String list : listNames) {
+            if (infoValue.toLowerCase().contains(list)) {
+                return null;
+            }
+        }
+
+
+        // In allen infoValues wird, wenn enthalten, XML Code gelöscht.
+        infoValue = infoValue.replaceAll("\\<(.*?)\\>", " ");
+
+
+        String[] words = infoValue.split("]]");
+        infoValue = "";
+        for (String word : words) {
+            if (word.contains("|")) {
+                word = word.replaceAll("(?<=\\[\\[)(.*?)\\|", "");
+            }
+            word = word.replace("[[", "").replace("]]", "");
+            infoValue += word;
+        }
+        infoValue = infoValue.replace("{{circa}}", "ca.")
+                .replace("{{thinsp}}", " ")
+                .replaceAll("\\{\\{sup(.*?)\\}\\}", "");
+
+
         // Je nach infoKey, führen wir verschiedene Operationen auf dem infoValue aus. Wenn es für den
         // infoKey keinen Case gibt, wird der infoValue unverändert wieder zurückgegeben.
         switch (infoKey) {
-            case "image ":
+            case "image":
                 // Der infoValue enthält den Namen der Bilddatei. Wir ersetzen alle Leerzeichen durch
-                // einen Underscore und hängen ihn an einen URL-Anfang. Die dadurch entstehende URL ist
+                // Underscores und hängen ihn an einen URL-Anfang. Die dadurch entstehende URL ist
                 // die URL des Bildes.
                 infoValue = infoValue.replaceAll("\\s", "_");
                 return "https://commons.wikimedia.org/wiki/Special:FilePath/" + infoValue;
 
-            case "birth_date ":
-            case "death_date ":
-                // Der infoValue enthält den Geburts- bzw. Sterbetag als Substring in Form von Year|Month|Day.
-                // Wir extrahieren das Datum und geben es formatiert zurück.
-                //TODO: das genaue Datum ist nicht immer bekannt ist, nur Jahr
-                infoValue = extractSubstring(infoValue, "(\\d{1,4}\\|\\d{1,2}\\|\\d{1,2})");
+            case "birth_date":
+            case "death_date":
+            case "term_start":
+            case "term_end":
+                // Der infoValue des Geburts- bzw. Sterbetags enthält das Datum als Substring in Form
+                // von Year|Month|Day. Wir extrahieren dieses Datum und geben es formatiert zurück.
+                // Daten die nicht dieses Format besitzen werden direkt formatiert.
+                if (infoValue.contains("date") && infoValue.contains("|")) {
+                    infoValue = extractSubstring(infoValue, "(\\d{1,4}\\|\\d{1,2}\\|\\d{1,2})");
+                }
                 return dateFormatter(infoValue);
 
-            case "term_start ":
-            case "term_end ":
-                return dateFormatter(infoValue);
+            case "name":
+            case "birth_name":
+            case "nationality":
+                // {{lang|fr|Name|optional}}
+                infoValue = infoValue.replaceAll("\\{\\{(.*?)\\|(.*?)\\|", " ");
+                infoValue = infoValue.replace("}}", "");
+                String[] names = infoValue.split(Pattern.quote("|"));
+                return names[0];
 
-            case "birth_place ":
+            case "office":
+            case "order":
+            case "party":
+            case "birth_place": //nowrap {{small|(now Israel)}}
+            case "death_place": // {{nowrap|Princeton, New Jersey, U.S.}}
+            case "known_for":  //{{nowrap|[[Invention of the telephone]]{{thinsp}}{{sup|b}}}}
+            case "occupation": //{{hlist|Novelist|[[short story writer]]|playwright|poet|memoirist}}
+                //{{hlist |Engineer |Professor{{thinsp}}{{sup|a}}}} {{ubl,csv
+                //{{Hlist | Occultist | poet | novelist | mountaineer }}>>>NEXT>>>education: {{unbulleted list|Malvern College|Tonbridge School|Eastbourne College}}
+            case "education": // {{unbulleted list|[[Malvern College]]|[[Tonbridge School]]|[[Eastbourne College]]}}
+                infoValue = infoValue.replaceAll("\\{\\{(.*?)\\|", "");
+                infoValue = infoValue.replace("}}", "")
+                        .replace("{{","")
+                        .replace("|", ", ");
                 return infoValue;
-            //TODO: weitere Fälle hinzufügen
         }
         return infoValue;
     }
@@ -203,17 +274,17 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         }
 
         // Wir legen unser gewünschtes Datumsformat als formatter fest.
-        SimpleDateFormat formatter = new SimpleDateFormat("y-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("G-y-MM-dd");
         // Die patternList enthält die Datumsformate, die das gegebene Datum haben kann.
         String[] patternList = {
-                "d MMM y",
-                "MMM d, y",
-                "dd MMM y",
-                "MMM dd, y",
-                "y|M|d",
-                "y|MM|d",
-                "y|M|dd",
-                "y|MM|dd"
+                "d MMM yyyy G",
+                "d MMM G yyyy",
+                "G d MMM yyyy",
+                "d MMM yyyy",
+                "MMM d, yyyy",
+                "MMM d yyyy",
+                "d.MM.yyyy",
+                "yyyy|MM|d"
         };
 
         // Wir versuchen für jedes Datumsformat das gegebene Datum zu parsen. Wenn das Datum geparst
@@ -226,6 +297,55 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             } catch (ParseException ignored) {
             }
         }
+        return yearFormatter(date);
+    }
+
+
+    private String yearFormatter(String date) {
+        String year = extractSubstring(date, "(AD|BC)\\s\\d{1,4}|\\d{1,4}\\s(AD|BC)|\\d{1,4}");
+        if (year == null || year.isEmpty()) {
+            return null;
+        }
+
+        // Wir legen unser gewünschtes Datumsformat als formatter fest.
+        SimpleDateFormat formatter = new SimpleDateFormat("G-y");
+        // Die patternList enthält die Datumsformate, die das gegebene Datum haben kann.
+        String[] patternList = {
+                "yyyy G",
+                "G yyyy",
+                "yyyy"
+        };
+
+        // Wir versuchen für jedes Datumsformat das gegebene Datum zu parsen. Wenn das Datum geparst
+        // werden konnte, wird es formatiert und zurückgegeben.
+        for (String pattern : patternList) {
+            SimpleDateFormat parser = new SimpleDateFormat(pattern);
+            try {
+                Date parsedDate = parser.parse(year);
+                return formatter.format(parsedDate);
+            } catch (ParseException ignored) {
+            }
+        }
         return null;
+    }
+
+
+    private String curvedBracketTest(String infoValue) {
+        if (infoValue == null ) {
+            return null;
+        }
+
+        while (infoValue.contains("{") && infoValue.contains("}")) {
+            infoValue = infoValue.replaceAll("\\{(.*?)\\}","");
+        }
+
+        if (infoValue.contains("{") && !infoValue.contains("}")) {
+            String[] textChunks = infoValue.split(Pattern.quote("{"));
+            return textChunks[0];
+        } else if (infoValue.contains("}") && !infoValue.contains("{")) {
+            String[] textChunks = infoValue.split(Pattern.quote("}"));
+            return textChunks[1];
+        }
+        return infoValue;
     }
 }
