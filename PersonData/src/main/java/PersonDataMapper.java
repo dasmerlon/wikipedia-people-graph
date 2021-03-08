@@ -188,14 +188,15 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
 
         String[] words = infoValue.split("]]");
-        infoValue = "";
+        StringBuilder infoValueBuilder = new StringBuilder();
         for (String word : words) {
             if (word.contains("|")) {
                 word = word.replaceAll("(?<=\\[\\[)(.*?)\\|", "");
             }
             word = word.replace("[[", "").replace("]]", "");
-            infoValue += word;
+            infoValueBuilder.append(word);
         }
+        infoValue = infoValueBuilder.toString();
         infoValue = infoValue.replace("{{circa}}", "ca.")
                 .replace("{{thinsp}}", " ")
                 .replaceAll("\\{\\{sup(.*?)\\}\\}", "");
@@ -230,6 +231,9 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 infoValue = infoValue.replaceAll("\\{\\{(.*?)\\|(.*?)\\|", " ");
                 infoValue = infoValue.replace("}}", "");
                 String[] names = infoValue.split(Pattern.quote("|"));
+                if (names.length == 0) {
+                    return null;
+                }
                 return names[0];
 
             case "office":
@@ -344,7 +348,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
 
     private String curvedBracketTest(String infoValue) {
-        if (infoValue == null ) {
+        if (infoValue == null || infoValue.isEmpty()) {
             return null;
         }
 
@@ -354,9 +358,17 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
 
         if (infoValue.contains("{") && !infoValue.contains("}")) {
             String[] textChunks = infoValue.split(Pattern.quote("{"));
+            if (textChunks.length == 0) {
+                return null;
+            }
             return textChunks[0];
         } else if (infoValue.contains("}") && !infoValue.contains("{")) {
             String[] textChunks = infoValue.split(Pattern.quote("}"));
+            if (textChunks.length == 0) {
+                return null;
+            } else if (textChunks.length < 2) {
+                return textChunks[0];
+            }
             return textChunks[1];
         }
         return infoValue;
