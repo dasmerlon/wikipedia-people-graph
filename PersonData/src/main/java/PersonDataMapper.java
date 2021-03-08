@@ -81,7 +81,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 // Wir ersetzen alle Leerzeichen durch Underscores und hängen ihn an einen URL-Anfang.
                 // Die dadurch entstehende URL ist die URL des Wikipediaartikels.
                 String urlEnd = title.replaceAll("\\s", "_");
-                infoList.add("URL: " + "https://en.wikipedia.org/wiki/" + urlEnd);
+                addToList("URL", "https://en.wikipedia.org/wiki/" + urlEnd.trim(), infoList);
                 continue;
             }
 
@@ -100,7 +100,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 if (description == null || description.isEmpty()) {
                     continue;
                 }
-                infoList.add("Short Description: " + description.trim());
+                addToList("Short Description", description.trim(), infoList);
                 continue;
             }
 
@@ -125,7 +125,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                     if (infoValue == null || infoValue.isEmpty()) {
                         continue;
                     }
-                    infoList.add(infoKey.trim() + ": " + infoValue.trim());
+                    addToList(infoKey.trim(), infoValue.trim(), infoList);
                 }
             }
         }
@@ -136,6 +136,19 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         String information = String.join(">>>NEXT>>>", infoList);
         infos.set(information);
         context.write(name, infos);
+    }
+
+
+    private void addToList(String infoKey, String infoValue, ArrayList<String> list) {
+
+        ArrayList<String> keyList = new ArrayList<>();
+        for (String element : list) {
+            String[] subelement = element.split(Pattern.quote(":"));
+            keyList.add(subelement[0]);
+        }
+        if (!keyList.contains(infoKey)) {
+            list.add(infoKey + ": " + infoValue);
+        }
     }
 
 
