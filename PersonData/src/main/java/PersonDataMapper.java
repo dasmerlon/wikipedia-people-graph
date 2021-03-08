@@ -61,7 +61,6 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         // Informationen.
         String page = value.toString();
         String[] lines = page.split("\\r?\\n");
-        ArrayList<String> infoList = new ArrayList<>();
 
         // Wir iterieren über alle Zeilen des Personenartikels und entfernen zunächst alle Leerzeichen am
         // Anfang und am Ende. Danach werden die Zeilen überprüft, ob sie den Titel, die Kurzbeschreibung
@@ -76,12 +75,13 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             if (line.startsWith("<title>")) {
                 String title = line.replace("<title>", "");
                 title = title.replace("</title>", "");
-                name.set(title + "<<<ENDTITLE<<<");
+                name.set(title);
 
                 // Wir ersetzen alle Leerzeichen durch Underscores und hängen ihn an einen URL-Anfang.
                 // Die dadurch entstehende URL ist die URL des Wikipediaartikels.
                 String urlEnd = title.replaceAll("\\s", "_");
-                addToList("URL", "https://en.wikipedia.org/wiki/" + urlEnd.trim(), infoList);
+                infos.set("url**#**" + "https://en.wikipedia.org/wiki/" + urlEnd.trim());
+                context.write(name, infos);
                 continue;
             }
 
@@ -100,7 +100,8 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 if (description == null || description.isEmpty()) {
                     continue;
                 }
-                addToList("Short Description", description.trim(), infoList);
+                infos.set("short_description**#**" + description.trim());
+                context.write(name, infos);
                 continue;
             }
 
@@ -125,29 +126,10 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                     if (infoValue == null || infoValue.isEmpty()) {
                         continue;
                     }
-                    addToList(infoKey.trim(), infoValue.trim(), infoList);
+                    infos.set(infoKey + "**#**" + infoValue.trim());
+                    context.write(name, infos);
                 }
             }
-        }
-
-        // Die Elemente der ArrayList werden mit einem eindeutigen Delimiter voneinander abgegrenzt und zu
-        // einem String zusammengefasst, welcher als Output Value übergeben wird. Der Mapper gibt anschließend
-        // den Output Key name und den Output Value infos als Text-Objekt aus.
-        String information = String.join(">>>NEXT>>>", infoList);
-        infos.set(information);
-        context.write(name, infos);
-    }
-
-
-    private void addToList(String infoKey, String infoValue, ArrayList<String> list) {
-
-        ArrayList<String> keyList = new ArrayList<>();
-        for (String element : list) {
-            String[] subelement = element.split(Pattern.quote(":"));
-            keyList.add(subelement[0]);
-        }
-        if (!keyList.contains(infoKey)) {
-            list.add(infoKey + ": " + infoValue);
         }
     }
 
@@ -239,6 +221,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             case "office":
             case "order":
             case "party":
+            case "death_cause":
             case "birth_place": //nowrap {{small|(now Israel)}}
             case "death_place": // {{nowrap|Princeton, New Jersey, U.S.}}
             case "known_for":  //{{nowrap|[[Invention of the telephone]]{{thinsp}}{{sup|b}}}}
