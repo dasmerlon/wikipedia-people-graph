@@ -33,7 +33,7 @@ public class PersonData {
         job.setMapperClass(PersonDataMapper.class);
         job.setReducerClass(InformationReducer.class);
         job.setInputFormatClass(XmlInputFormat.class);
-        job.setNumReduceTasks(1);
+        //job.setNumReduceTasks(0);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
