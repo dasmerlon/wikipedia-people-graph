@@ -4,8 +4,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,8 +17,8 @@ import java.util.regex.Pattern;
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
     //TODO: Reduce Job, der doppelte Infos entfernt. Behalten: das 1.
 
-    private final Text name = new Text();
     private final Text infos = new Text();
+    private final Text none = new Text();
 
     /**
      * Diese Methode beinhaltet die Logik eines Mappers. Aus dem Input value, der den Personenartikel enthält,
@@ -62,6 +61,12 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         String page = value.toString();
         String[] lines = page.split("\\r?\\n");
 
+        ArrayList<String> keyList = new ArrayList<>();
+        ArrayList<String> infoList = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            infoList.add("NONE");
+        }
+
         // Wir iterieren über alle Zeilen des Personenartikels und entfernen zunächst alle Leerzeichen am
         // Anfang und am Ende. Danach werden die Zeilen überprüft, ob sie den Titel, die Kurzbeschreibung
         // oder eine Personeninformation enthalten.
@@ -75,13 +80,15 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             if (line.startsWith("<title>")) {
                 String title = line.replace("<title>", "");
                 title = title.replace("</title>", "");
-                name.set(title);
+                addToList("title", title, infoList, keyList);
+                //name.set(title);
 
                 // Wir ersetzen alle Leerzeichen durch Underscores und hängen ihn an einen URL-Anfang.
                 // Die dadurch entstehende URL ist die URL des Wikipediaartikels.
                 String urlEnd = title.replaceAll("\\s", "_");
-                infos.set("url**#**" + "https://en.wikipedia.org/wiki/" + urlEnd.trim());
-                context.write(name, infos);
+                addToList("url", "https://en.wikipedia.org/wiki/" + urlEnd.trim(), infoList, keyList);
+                //infos.set("url**#**" + "https://en.wikipedia.org/wiki/" + urlEnd.trim());
+                //context.write(name, infos);
                 continue;
             }
 
@@ -100,8 +107,9 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 if (description == null || description.isEmpty()) {
                     continue;
                 }
-                infos.set("short_description**#**" + description.trim());
-                context.write(name, infos);
+                addToList("short_description", description.trim(), infoList, keyList);
+                //infos.set("short_description**#**" + description.trim());
+                //context.write(name, infos);
                 continue;
             }
 
@@ -126,10 +134,49 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                     if (infoValue == null || infoValue.isEmpty()) {
                         continue;
                     }
-                    infos.set(infoKey + "**#**" + infoValue.trim());
-                    context.write(name, infos);
+                    addToList(infoKey.trim(), infoValue.trim(), infoList, keyList);
+                    //infos.set(infoKey + "**#**" + infoValue.trim());
+                    //context.write(name, infos);
                 }
             }
+        }
+        // Die Elemente der ArrayList werden mit einem eindeutigen Delimiter voneinander abgegrenzt und zu
+        // einem String zusammengefasst, welcher als Output Value übergeben wird. Der Mapper gibt anschließend
+        // den Output Key name und den Output Value infos als Text-Objekt aus.
+        infos.set(String.join(">>>>", infoList));
+        context.write(infos, none);
+    }
+
+
+
+    private void addToList(String infoKey, String infoValue, ArrayList<String> list, ArrayList<String> keyList) {
+
+        Map<String, Integer> infoMapping = new HashMap<>();
+        infoMapping.put("title", 0);
+        infoMapping.put("url", 1);
+        infoMapping.put("short_description", 2);
+        infoMapping.put("image", 3);
+        infoMapping.put("name", 4);
+        infoMapping.put("birth_name", 5);
+        infoMapping.put("birth_date", 6);
+        infoMapping.put("birth_place", 7);
+        infoMapping.put("death_date", 8);
+        infoMapping.put("death_place", 9);
+        infoMapping.put("death_cause", 10);
+        infoMapping.put("nationality", 11);
+        infoMapping.put("education", 12);
+        infoMapping.put("known_for", 13);
+        infoMapping.put("occupation", 14);
+        infoMapping.put("order", 15);
+        infoMapping.put("office", 16);
+        infoMapping.put("term_start", 17);
+        infoMapping.put("term_end", 18);
+        infoMapping.put("party", 19);
+
+        if (!keyList.contains(infoKey)) {
+            int index = infoMapping.get(infoKey);
+            list.set(index, infoValue);
+            keyList.add(infoKey);
         }
     }
 

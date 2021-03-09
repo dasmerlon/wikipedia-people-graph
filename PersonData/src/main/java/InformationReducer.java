@@ -1,4 +1,3 @@
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -10,9 +9,9 @@ import java.util.regex.Pattern;
 
 
 /**
- * "TITLE>>>>URL>>>>SHORT_DESCRIPTION>>>>IMAGE>>>>NAME>>>>BIRTH_NAME>>>>BIRTH_DATE>>>>" +
- *                 "BIRTH_PLACE>>>>DEATH_DATE>>>>DEATH_PLACE>>>>DEATH_CAUSE>>>>NATIONALITY>>>>EDUCATION>>>>" +
- *                 "KNOWN_FOR>>>>OCCUPATION>>>>ORDER>>>>OFFICE>>>>TERM_START>>>>TERM_END>>>>PARTY"
+ * "TITLE>>>>URL>>>>SHORT_DESCRIPTION>>>>IMAGE>>>>NAME>>>>BIRTH_NAME>>>>BIRTH_DATE>>>>BIRTH_PLACE>>>>
+ * DEATH_DATE>>>>DEATH_PLACE>>>>DEATH_CAUSE>>>>NATIONALITY>>>>EDUCATION>>>>KNOWN_FOR>>>>OCCUPATION>>>>
+ * ORDER>>>>OFFICE>>>>TERM_START>>>>TERM_END>>>>PARTY"
  */
 public class InformationReducer extends Reducer<Text, Text, Text, Text> {
 
@@ -55,8 +54,9 @@ public class InformationReducer extends Reducer<Text, Text, Text, Text> {
             String infoKey = infos[0];
 
             for (Map.Entry<String, Integer> entry : infoMapping.entrySet()) {
+                String hashKey = entry.getKey();
                 int index = entry.getValue();
-                if (infoKey.equals(entry.getKey()) && infoList.get(index).equals("NONE")) {
+                if (infoKey.equals(hashKey) && infoList.get(index).equals("NONE")) {
                     //addToList(entry.getValue(), entry.getKey(), infos[1], infoList);
                     infoList.set(index, infos[1]);
                 }
