@@ -1,34 +1,50 @@
   anychart.onDocumentReady(function () {
 
     // create data
-    var data = [
+
+/*      var data = [
+             {
+               id: "1",
+               name: "Dschingis Khan",
+               birth_date: "1125-02-07",
+               death_date: "1213-01-05",
+               info: "Dischingis Khan konnte ganz gut mit Bögen und Pferden."
+             },
+             {
+               id: "2",
+               name: "Mahad Ma Gandi",
+               birth_date: "1920-09-11",
+               death_date: "1980-08-07",
+               info: "Hat so viel Yoga gemacht, dass es für ne Revolution reichte."
+             },
+             {
+
+             id: "3",
+             name: "Rainer Kallmund",
+             birth_date: "1970-10-11",
+             info: "Rainer Kallmund ist ein deutscher Fußballfunktionär und Lebemann."
 
 
-          {
-            id: "1",
-            name: "Dschingis Khan",
-            birth_date: "1125-02-07",
-            death_date: "1213-01-05",
-            info: "Dischingis Khan konnte ganz gut mit Bögen und Pferden."
-          },
-          {
-            id: "2",
-            name: "Mahad Ma Gandi",
-            birth_date: "1920-09-11",
-            death_date: "1980-08-07",
-            info: "Hat so viel Yoga gemacht, dass es für ne Revolution reichte."
-          },
-          {
-          id: "3",
-          name: "Rainer Kallmund",
-          birth_date: "1970-10-11",
-          info: "Rainer Kallmund ist ein deutscher Fußballfunktionär und Lebemann."
+             }
+           ]*/
 
 
-            }
+    /*var data = (function() {
+                 var json = null;
+                 $.ajax({
+                   'async': true,
+                   'global': false,
+                   'url': "JSONs/test.json",
+                   'dataType': "json",
+                   'success': function(data) {
+                     json = data;
+                   }
+                 });
+                 return json;
+               })();*/
 
 
-    ];
+    anychart.data.loadJsonFile('http://localhost:8080/JSONs/test.json', function (data) {
 
     // set the input date/time format
     anychart.format.inputDateTimeFormat("yyyy-MM-dd");
@@ -42,7 +58,7 @@
     var mapping = treeData.mapAs({actualStart: "birth_date", actualEnd: "death_date"});
 
     // create a chart
-    chart = anychart.ganttProject();
+    var chart = anychart.ganttProject(data);
 
     //CLICKIBUNTI
     chart.background("#64b5f6 0.2");
@@ -80,7 +96,7 @@
     and update the chart title */
     chart.listen("rowClick", function (e) {
       var itemName = e.item.get("info");
-      chart.title(itemName);
+
       document.getElementById("TextDisplay").innerHTML = itemName;
     });
 
@@ -144,7 +160,9 @@
 
     // fit elements to the width of the timeline
     chart.fitAll();
-});
+        });
+
+ });
 
 // zoom the timeline in
 function zoomIn() {

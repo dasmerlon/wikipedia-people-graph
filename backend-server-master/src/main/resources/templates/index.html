@@ -36,7 +36,7 @@
   <link href="css/dashboard.css" rel="stylesheet">
 
 
-  <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-core.min.js"> </script>
+  <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-bundle.min.js"> </script>
   <script src ="https://cdn.anychart.com/releases/8.6.0/js/anychart-gantt.min.js"></script>
 
 
@@ -155,7 +155,8 @@
       <button id="zoomOutButton" onclick="zoomOut()">-</button>
       <label>zoom factor: 2</label>
       <br>
-      <button id="zoomToDatesButton" onclick="zoomToDates()">Zoom To Dates</button>
+      <br>
+     <!-- <button id="zoomToDatesButton" onclick="zoomToDates()">Zoom To Dates</button>
       <label>start date:</label>
       <label id="dateLabel1">03 February 2018</label>
       <label>end date: </label>
@@ -183,6 +184,14 @@
         <option value="last-date">last-date</option>
         <option value="last-visible-date">last-visible-date</option>
       </select>
+      <br>-->
+
+      <button id="SubmitInput" onclick="zoomToUnits()">Filter!</button>
+      <label>Person: <input type="text" id="PersonInput" ></label>
+      <label>Profession: <input type="text" id="ProfessionInput" ></label>
+      <label>Lived from : <input type="date" id="LivedFromInput" ></label>
+      <label>Lived until : <input type="date" id="LivedUntilInput" ></label>
+      <br>
       <br>
 
 
@@ -191,7 +200,7 @@
         <div id = "container" style="height: 500px;"> </div>
 
 
-
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
       <script src="JavaScript/anychart_gantt.js">
       </script>
