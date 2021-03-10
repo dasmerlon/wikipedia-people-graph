@@ -1,3 +1,4 @@
+/*
 package basecamp.project.server.controller;
 
 
@@ -17,7 +18,7 @@ public class UserController {
 	private String key;
 
 	@GetMapping
-	public String users(@RequestParam(defaultValue = "User") String name)  {
+	public String users_alt(@RequestParam(defaultValue = "User") String name)  {
 
 
 		JSONObject result =new JSONObject();
@@ -77,10 +78,11 @@ public class UserController {
 				"]";
 	}
 
-	@RequestMapping("nrusers")
+	@RequestMapping("nrusers_alt")
 	String nrUsers() {
 		return "2";
 	}
 
 
 }
+*/

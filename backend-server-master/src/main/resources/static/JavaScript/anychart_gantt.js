@@ -43,9 +43,17 @@
                  return json;
                })();*/
 
-    var name = "Eugen";
-    anychart.data.loadJsonFile('http://localhost:8080/users/?name=' + name,   function (data) {
+ /*   var name = "Eugen";
+    anychart.data.loadJsonFile('http://localhost:8080/users/?name=' + name,   function (data) {*/
 
+    var persons;
+    var firstdate;
+    var enddate;
+    var profession;
+
+
+
+    anychart.data.loadJsonFile('http://localhost:8080/users/?person=' + persons + '?birthdate=' + firstdate + '?deathdate=' + enddate + '?job=' + profession,   function (data) {
     // set the input date/time format
     anychart.format.inputDateTimeFormat("yyyy-MM-dd");
 
@@ -162,6 +170,8 @@
     chart.fitAll();
         });
 
+
+
  });
 
 // zoom the timeline in
@@ -186,3 +196,13 @@ function zoomToUnits() {
   var anchor = document.getElementById("anchorSelect").value;
   chart.zoomTo(unit, count, anchor);
 }
+
+// zoom the timeline to the given units
+function getSubmitFields() {
+  persons = document.getElementById("PersonInput").value;
+  firstdate = document.getElementById("LivedFromInput").value;
+  enddate = document.getElementById("LivedUntilInput").value;
+  profession = document.getElementById("ProfessionInput").value;
+
+}
+
