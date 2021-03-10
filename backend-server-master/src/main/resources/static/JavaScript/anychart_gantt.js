@@ -43,8 +43,8 @@
                  return json;
                })();*/
 
-
-    anychart.data.loadJsonFile('http://localhost:8080/JSONs/test.json', function (data) {
+    var name = "Eugen";
+    anychart.data.loadJsonFile('http://localhost:8080/users/?name=' + name,   function (data) {
 
     // set the input date/time format
     anychart.format.inputDateTimeFormat("yyyy-MM-dd");
