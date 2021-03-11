@@ -34,6 +34,7 @@ public class FilterController {
 	{
 
 		MySQLconnect con = new MySQLconnect();
+		System.out.println("Connector erstellt");
 		//double[] watsonData = con.getWatson(date);
 		JSONArray jsonout = con.getWatson(person, birthdate, deathdate, job);
 

@@ -66,10 +66,13 @@ public class MySQLconnect{
 		}
 
 		try {
-			Class.forName("com.mysql.jdbc.Driver");    // Datenbanktreiber für JDBC Schnittstellen laden.
+			Class.forName("com.mysql.cj.jdbc.Driver");    // Datenbanktreiber für JDBC Schnittstellen laden.
+
+			System.out.println("Versuche mit " + "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useSSL=false"+"," + dbUser +"," + dbPass + "zu verbinden");
 
 			// Verbindung zur JDBC-Datenbank herstellen.
 			con = DriverManager.getConnection("jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useSSL=false", dbUser, dbPass);
+			System.out.println("Verbindung zur JDBC-Datenbank hergestellt");
 		} catch (ClassNotFoundException e) {
 			System.out.println("Treiber nicht gefunden");
 		} catch (SQLException e) {
@@ -101,6 +104,7 @@ public class MySQLconnect{
 		Statement st = null;
 		try {
 			st = con.createStatement();
+			System.out.println("Statement erstellt");
 		} catch (SQLException e) {
 			System.out.println("Statement konnte nicht erstellt werden");
 		}

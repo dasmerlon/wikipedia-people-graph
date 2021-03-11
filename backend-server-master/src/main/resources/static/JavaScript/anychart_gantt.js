@@ -46,13 +46,13 @@
  /*   var name = "Eugen";
     anychart.data.loadJsonFile('http://localhost:8080/users/?name=' + name,   function (data) {*/
 
-    var persons;
-    var firstdate;
-    var enddate;
-    var profession;
+    var persons = "";
+    var firstdate = "";
+    var enddate = "";
+    var profession = "";
 
 
-
+    // ruft users, die users Methode im FilterController auf?
     anychart.data.loadJsonFile('http://localhost:8080/users/?person=' + persons + '?birthdate=' + firstdate + '?deathdate=' + enddate + '?job=' + profession,   function (data) {
     // set the input date/time format
     anychart.format.inputDateTimeFormat("yyyy-MM-dd");
