@@ -30,7 +30,6 @@
     </dependencies>
 
     <build>
-        <!-- <finalName>APP</finalName> -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
