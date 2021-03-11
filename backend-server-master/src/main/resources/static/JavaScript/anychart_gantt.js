@@ -1,4 +1,13 @@
-  anychart.onDocumentReady(function () {
+  var persons = "";
+  var firstdate = "";
+  var enddate = "";
+  var profession = "Politics";
+
+  //anychart.onDocumentReady(function buildeMal() {
+
+  anychart.onDocumentReady(buildeMal());
+
+  function buildeMal() {
 
     // create data
 
@@ -46,24 +55,34 @@
  /*   var name = "Eugen";
     anychart.data.loadJsonFile('http://localhost:8080/users/?name=' + name,   function (data) {*/
 
-    var persons = "";
-    var firstdate = "";
-    var enddate = "";
-    var profession = "";
 
+
+
+
+    var container = document.getElementById("container");
+    container.innerHTML = "" ;
 
     // ruft users, die users Methode im FilterController auf?
-    anychart.data.loadJsonFile('http://localhost:8080/users/?person=' + persons + '?birthdate=' + firstdate + '?deathdate=' + enddate + '?job=' + profession,   function (data) {
+    //anychart.data.loadJsonFile('http://localhost:8080/users/' + '?person=' + persons + '?birthdate=' + firstdate + '?deathdate=' + enddate + '?job=' + profession,   function (data) {
+    anychart.data.loadJsonFile('http://localhost:8080/users' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession,   function (data) {
+
+
     // set the input date/time format
-    anychart.format.inputDateTimeFormat("yyyy-MM-dd");
+    anychart.format.inputDateTimeFormat("G-yyyy-MM-dd");
+
+    //anychart.format.inputDateTimeFormat("yyyy");
+
 
     // set the output date/time format
-    anychart.format.outputDateTimeFormat("d MMMM yyyy");
+    //anychart.format.outputDateTimeFormat("yyyy");
+    anychart.format.outputDateTimeFormat("G d MMMM yyyy");
+
 
     // create a data tree
     var treeData = anychart.data.tree(data, "as-tree");
 
-    var mapping = treeData.mapAs({actualStart: "birth_date", actualEnd: "death_date"});
+    var mapping = treeData.mapAs({name: "TITLE", actualStart: "BIRTH_DATE", actualEnd: "DEATH_DATE"}); //evtl. NAME statt TITLE?
+    // var mapping = treeData.mapAs({name: "Name", actualStart: "Birthdate", actualEnd: "Deathdate"}); //evtl. NAME statt TITLE?
 
     // create a chart
     var chart = anychart.ganttProject(data);
@@ -103,9 +122,11 @@
     /* listen to the rowClick event
     and update the chart title */
     chart.listen("rowClick", function (e) {
-      var itemName = e.item.get("info");
+      var itemName = e.item.get("SHORT_DESCRIPTION");
+      var imgLink = e.item.get("IMAGE");
+      var imgLink = "'" + imgLink + "'";
 
-      document.getElementById("TextDisplay").innerHTML = itemName;
+      document.getElementById("TextDisplay").innerHTML = itemName + "<img> src=" + imgLink;
     });
 
 
@@ -139,14 +160,17 @@
        chart.getTimeline().tooltip().useHtml(true);
        chart.getTimeline().tooltip().format(
                "<span style='font-weight:300;font-size:10pt'>" + "Born on " +
-                    "{%actualStart}{dateTimeFormat:d MMMM yyyy}<br>"  + "Died on " +
-                    "{%actualEnd}{dateTimeFormat:d MMMM yyyy}</span>"
+                    "{%actualStart}{dateTimeFormat:G d MMMM yyyy}<br>"  + "Died on " +
+                    "{%actualEnd}{dateTimeFormat:G d MMMM yyyy}</span>"
 
        );
 
 
     // set the data
     chart.data(mapping); //mapping oder treedata als input, liefert
+
+
+
 
 // set the minimum and maximum values of the scale
     chart.getTimeline().scale().minimum("0000-01-01");
@@ -170,9 +194,9 @@
     chart.fitAll();
         });
 
+     chart.invalidate();
 
-
- });
+ };
 
 // zoom the timeline in
 function zoomIn() {
@@ -203,6 +227,7 @@ function getSubmitFields() {
   firstdate = document.getElementById("LivedFromInput").value;
   enddate = document.getElementById("LivedUntilInput").value;
   profession = document.getElementById("ProfessionInput").value;
+  buildeMal();
 
 }
 

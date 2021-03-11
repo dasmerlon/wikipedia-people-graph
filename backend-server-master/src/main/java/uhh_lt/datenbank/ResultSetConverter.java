@@ -2,7 +2,7 @@ package uhh_lt.datenbank;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -67,6 +67,9 @@ public class ResultSetConverter {
 			}
 
 			json.put(obj);
+			System.out.println(obj.toString());
+
+
 		}
 
 		return json;

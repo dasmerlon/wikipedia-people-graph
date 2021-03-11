@@ -27,19 +27,19 @@ import java.sql.ResultSetMetaData;
  */
 public class MySQLconnect{
 	private static Connection con = null;
-	private static String dbHost;	// Hostname
-	private static String dbPort = "3306";		// Port -- Standard: 3306
-	private static String dbName;	// Datenbankname
-	private static String dbUser;;		// Datenbankuser
-	private static String dbPass;		// Datenbankpasswort
-	private static String dbTable = "PersonData";		// Tabelle
+	private static String dbHost = "127.0.0.1";			// Hostname
+	private static String dbPort = "3306";					// Port -- Standard: 3306
+	private static String dbName = "peoplegraph_prakt21";	// Datenbankname
+	private static String dbUser = "peoplegraph_prakt21";	// Datenbankuser
+	private static String dbPass = "W22$wqtF";				// Datenbankpasswort
+	private static String dbTable = "PersonData";	// Tabelle //PersonData PersonsStringDate
 
 	/**
 	 * Stellt eine Verbindung zur Datenbank her.
 	 */
 	public MySQLconnect() {
 		// get credentials
-		InputStream is = MySQLconnect.class.getResourceAsStream("/credentials.txt");
+		/*InputStream is = MySQLconnect.class.getResourceAsStream("/credentials.txt");
 		InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
 		BufferedReader reader = new BufferedReader(streamReader);
 		try {
@@ -63,15 +63,17 @@ public class MySQLconnect{
 			reader.close();
 		} catch (IOException e) {
 			System.out.println("Abfrage hat nicht funktioniert");
-		}
+		}*/
+
 
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");    // Datenbanktreiber für JDBC Schnittstellen laden.
 
-			System.out.println("Versuche mit " + "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useSSL=false"+"," + dbUser +"," + dbPass + "zu verbinden");
+			System.out.println("Versuche mit " + "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useSSL=false"+"," + dbUser +"," + dbPass + " zu verbinden");
 
 			// Verbindung zur JDBC-Datenbank herstellen.
 			con = DriverManager.getConnection("jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?useSSL=false", dbUser, dbPass);
+			//con = DriverManager.getConnection("jdbc:mysql://134.100.14.49:3306/" + dbName + "?user=" + dbUser + "&password=" + dbPass + "&useUnicode=true&characterEncoding=UTF-8");
 			System.out.println("Verbindung zur JDBC-Datenbank hergestellt");
 		} catch (ClassNotFoundException e) {
 			System.out.println("Treiber nicht gefunden");
@@ -99,7 +101,7 @@ public class MySQLconnect{
 	 * Liest Watson Daten aus der Datenbank aus und errechnet Durchschnittswerte für den Sentiment Score und die Emotions.
 	 * * @return ein double Array mit den Watson Werten in der Reihenfolge Sentiment, Sadness, Joy, Fear, Disgust, Anger
 	 */
-	public JSONArray getWatson(String person, String birthdate, String deathdate, String job) { //TODO PARAMETER MUESSEN NOCH IN DIE QUERY EINGEBAUT WERDEN
+	public String getWatson(String person, String birthdate, String deathdate, String job) { //TODO PARAMETER MUESSEN NOCH IN DIE QUERY EINGEBAUT WERDEN
 
 		Statement st = null;
 		try {
@@ -109,15 +111,70 @@ public class MySQLconnect{
 			System.out.println("Statement konnte nicht erstellt werden");
 		}
 
-		String sql = ("SELECT * FROM " + dbTable + " ;"); //"SELECT * FROM " + dbTable + " WHERE TITLE = 'Abraham Lincoln';"
+
+		if(person.equals(""))
+		{
+			person = "!=" + "'" + person + "'";
+		}
+
+		else
+		{
+			person = "=" + "'" + person + "'";
+		}
+
+		if(birthdate.equals(""))
+		{
+			birthdate = "!=" + "'" + birthdate + "'";
+		}
+
+		else
+		{
+			birthdate = "=" + "'" + birthdate + "'";
+		}
+		if(deathdate.equals(""))
+		{
+			deathdate = "!=" + "'" + deathdate + "'";
+		}
+
+		else
+		{
+			deathdate = "=" + "'" + deathdate + "'";
+		}
+		if(job.equals(""))
+		{
+			job = "!=" + "'" + job + "'";
+		}
+
+		else
+		{
+			job = "=" + "'" + job + "'";
+		}
+
+
+
+
+		//String X = "'Julius Caesar'";
+		//String sql = ("SELECT * FROM " + dbTable + " WHERE TITLE=" + X + ";");
+		String sql = ("SELECT * FROM " + dbTable + " WHERE OCCUPATION" +  job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person +" ;");
+		// "SELECT * FROM " + dbTable + " WHERE TITLE = 'Abraham Lincoln';"
+
+		//String sql = ("SELECT * FROM " + dbTable + " WHERE BIRTH_DATE" + birthdate +" AND DEATH_DATE" + deathdate + " AND TITLE" + person + " AND OCCUPATION" + job +" ;");
+
+		//"SELECT * FROM " + dbTable + " WHERE TITLE = 'Abraham Lincoln';"
+		//String sql = ("SELECT * FROM " + dbTable + "WHERE TITLE = "Julius Caesar" LIMIT 10"+" ;"); //"SELECT * FROM " + dbTable + " WHERE TITLE = 'Abraham Lincoln';"
 		//ResultSet rs = null;
 		ResultSet rs = null;
 		//TODO eventuell als JSONARRAY anpassen
 		try {
 			rs = st.executeQuery(sql);
 			JSONArray jsonReceived = uhh_lt.datenbank.ResultSetConverter.convert(rs);
+			System.out.println(jsonReceived);
+			String j = jsonReceived.toString();
 
-			return jsonReceived;
+			//JSONArray newJArray = new JSONArray(j);
+			System.out.println(j);
+
+			return j;
 
 
 		}
