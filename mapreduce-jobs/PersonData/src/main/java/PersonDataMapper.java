@@ -4,26 +4,32 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Die Klasse PersonDataMapper erbt von der Mapper Klasse und definiert den Mapper für den
  * Map-Only Job. Der Input Value, Output Key und Output Value wird als Text-Objekt festgelegt.
- * Der Mapper bekommt einen ganzen Wikipediaartikel einer Person im XML Format, aus dem er
- * den Titel (Output Key) und bestimmte Personeninformationen (Output Value) extrahiert.
+ * Der Mapper bekommt als Input einen ganzen Wikipediaartikel einer Person im XML Format, aus
+ * dem er bestimmte Personeninformationen als Output Key extrahiert. Der Output Value bleibt leer.
+ * <p>
+ * Der Output des Mappers ist wie folgt aufgebaut:
+ * TITLE>>>>URL>>>>SHORT_DESCRIPTION>>>>IMAGE>>>>NAME>>>>BIRTH_NAME>>>>BIRTH_DATE>>>>BIRTH_PLACE>>>>DEATH_DATE>>>>
+ * DEATH_PLACE>>>>DEATH_CAUSE>>>>NATIONALITY>>>>EDUCATION>>>>KNOWN_FOR>>>>OCCUPATION>>>>ORDER>>>>OFFICE>>>>
+ * TERM_START>>>>TERM_END>>>>PARTY
  */
 public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
-    //TODO: Reduce Job, der doppelte Infos entfernt. Behalten: das 1.
 
     private final Text infos = new Text();
     private final Text none = new Text();
 
     /**
      * Diese Methode beinhaltet die Logik eines Mappers. Aus dem Input value, der den Personenartikel enthält,
-     * werden die Werte für den Output Key und Output Value ermittelt. Der Output Key ist dabei
-     * immer der Titel des Artikels und der Output Value enthält eine Reihe von Personeninformationen.
+     * werden die Werte für den Output Key ermittelt. Der Output Key enthält eine Reihe von Personeninformationen.
      *
      * @param key     der Offset des Seitenanfangs innerhalb der Datei
      * @param value   der Inhalt der Seite als Text-Objekt
@@ -56,11 +62,14 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         };
 
         // Wir speichern den Input Value als String page ab. Dieser String wird bei Zeilenumbrüchen
-        // gesplittet, damit wir über die Zeilen iterieren können. Eine ArrayList dient zum Sammeln aller
-        // Informationen.
+        // gesplittet, damit wir über die Zeilen iterieren können.
         String page = value.toString();
         String[] lines = page.split("\\r?\\n");
 
+        // Die ArrayList keyList dient dem Sammeln von Informationstypen, die für die Person gefunden wurden.
+        // Die ArrayList infoList dient zum Sammeln aller Informationsinhalte. Zu Beginn wird jeder Inhalt auf
+        // "NONE" gesetzt. Wenn später eine Information gefunden wird, wird der entsprechende Eintrag überschrieben.
+        // Nicht gefundene Informationen behalten den Inhalt "NONE".
         ArrayList<String> keyList = new ArrayList<>();
         ArrayList<String> infoList = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -73,22 +82,25 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         for (String line : lines) {
             line = line.trim();
 
+            // Es gibt Sandboxseiten, die wir herausfiltern wollen. Diese Seiten haben im Titel den Wikipedia-User
+            // angegeben. Wenn es sich also um eine Sandboxseite handelt, bearbeiten wir diese Seite nicht weiter.
+            if (line.startsWith("<title>") && line.toLowerCase().contains("user:")) {
+                return;
+            }
+
             // Der Titel von Personenartikeln enthält den Namen und gegebenenfalls eine eindeutige
-            // Beschreibung. Wir prüfen, ob die Zeile den Titel enthält und übergeben diesen,
-            // nachdem wir das XML aus der Zeile entfernt haben, zusammen mit einem eindeutigen
-            // Ending Delimiter als Output Key.
+            // Beschreibung. Wir prüfen, ob die Zeile den Titel enthält und fügen diesen,
+            // nachdem wir das XML aus der Zeile entfernt haben, zur ArrayList infoList hinzu.
             if (line.startsWith("<title>")) {
                 String title = line.replace("<title>", "");
                 title = title.replace("</title>", "");
                 addToList("title", title, infoList, keyList);
-                //name.set(title);
 
-                // Wir ersetzen alle Leerzeichen durch Underscores und hängen ihn an einen URL-Anfang.
-                // Die dadurch entstehende URL ist die URL des Wikipediaartikels.
+                // Wir ersetzen alle Leerzeichen des Titels durch Underscores und hängen ihn an einen URL-Anfang.
+                // Die dadurch entstehende URL ist die URL des Wikipediaartikels. Diese fügen wir anschließend
+                // auch zur infoList hinzu.
                 String urlEnd = title.replaceAll("\\s", "_");
                 addToList("url", "https://en.wikipedia.org/wiki/" + urlEnd.trim(), infoList, keyList);
-                //infos.set("url**#**" + "https://en.wikipedia.org/wiki/" + urlEnd.trim());
-                //context.write(name, infos);
                 continue;
             }
 
@@ -99,34 +111,38 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             if (line.toLowerCase().contains("{{short description|")) {
                 line = line.replace("}}", "");
                 String[] shortDesc = line.split(Pattern.quote("|"));
+
                 // Wenn die Zeile nicht gesplittet werden konnte, wird die Kurzbeschreibung ignoriert.
+                // Dies kann der Fall sein, wenn zb. nach dem Pipe-Symbol nichts steht.
                 if (shortDesc.length < 2) {
                     continue;
                 }
+
+                // Bevor wir die Kurzbeschreibung zur infoList hinzufügen, prüfen wir, ob die Beschreibung noch
+                // weitere geschweifte Klammern enthält und entfernen diese.
                 String description = curvedBracketTest(shortDesc[1]);
                 if (description == null || description.isEmpty()) {
                     continue;
                 }
                 addToList("short_description", description.trim(), infoList, keyList);
-                //infos.set("short_description**#**" + description.trim());
-                //context.write(name, infos);
                 continue;
             }
 
             // Die Art der Personeninformation steht zwischen einem Pipe-Symbol und einem Gleichheitszeichen.
-            // Zwischen dem InfoKey und dem Pipe-Symbol und dem InfoKey und dem Gleichheitszeichen
+            // Zwischen diesem InfoKey und dem Pipe-Symbol und dem InfoKey und dem Gleichheitszeichen
             // kann manchmal ein Leerzeichen sein. Wir müssen diese Fälle überprüfen, um ungewollte
             // Informationen auszuschließen, wie zb. "image1".
-            // Danach finden wird die Position des ersten Gleichheitszeichens und speichern den Substring
-            // nach dem Gleich als InfoValue. Der InfoValue wird mithilfe der Methode parseInfoValue
-            // bearbeitet und anschließend zusammen mit dem InfoKey zu der infoList hinzugefügt.
             for (String infoKey : personData) {
-                Boolean spaces = line.startsWith("| " + infoKey + " ");
-                Boolean noSpaces = line.startsWith("|" + infoKey + "=");
-                Boolean StartSpace = line.startsWith("| " + infoKey + "=");
-                Boolean endSpace = line.startsWith("|" + infoKey + " ");
+                Boolean hasSpaces = line.startsWith("| " + infoKey + " ");
+                Boolean hasNoSpaces = line.startsWith("|" + infoKey + "=");
+                Boolean hasStartSpace = line.startsWith("| " + infoKey + "=");
+                Boolean hasEndSpace = line.startsWith("|" + infoKey + " ");
 
-                if ((spaces || noSpaces || StartSpace || endSpace) && line.contains("=")) {
+                // Wenn eine Zeile mit dem infoKey gefunden wurde, finden wird die Position des ersten
+                // Gleichheitszeichens und speichern den Substring nach dem Gleich als InfoValue.
+                // Der InfoValue wird mithilfe der Methode parseInfoValue bearbeitet. Danach wird der infoValue
+                // noch auf weitere Klammern geprüft und anschließend zu der infoList hinzugefügt.
+                if ((hasSpaces || hasNoSpaces || hasStartSpace || hasEndSpace) && line.contains("=")) {
                     int position = line.indexOf("=");
                     String infoValue = line.substring(position + 1).trim();
                     infoValue = parseInfoValue(infoKey, infoValue);
@@ -135,22 +151,34 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                         continue;
                     }
                     addToList(infoKey.trim(), infoValue.trim(), infoList, keyList);
-                    //infos.set(infoKey + "**#**" + infoValue.trim());
-                    //context.write(name, infos);
                 }
             }
         }
         // Die Elemente der ArrayList werden mit einem eindeutigen Delimiter voneinander abgegrenzt und zu
-        // einem String zusammengefasst, welcher als Output Value übergeben wird. Der Mapper gibt anschließend
-        // den Output Key name und den Output Value infos als Text-Objekt aus.
+        // einem String zusammengefasst, welcher als Output Key übergeben wird. Der Mapper gibt anschließend
+        // den Output Key infos und den leeren Output Value als Text-Objekt aus.
         infos.set(String.join(">>>>", infoList));
         context.write(infos, none);
     }
 
 
-
+    /**
+     * Diese Methode ersetzt den entsprechenden Eintrag der ArrayList list mit dem infoValue, wenn diese
+     * Information bisher noch nicht gefunden wurde. Der richtige Index der ArrayList wird durch den infoKey
+     * bestimmt. Mit der keyList wird überprüft, ob der infoKey bereits schon gefunden wurde und dementsprechend
+     * schon ein Eintrag in der ArrayList list steht, der nicht überschrieben werden soll. Wenn der Wikipediaartikel
+     * also mehrere Einträge derselben Information enthält, übernehmen wir nur den ersten Eintrag und ignorieren
+     * alle weiteren.
+     *
+     * @param infoKey   der infoKey, der die Art der Information beschreibt
+     * @param infoValue der infoValue, der die eigentliche Information enthält
+     * @param list      die ArrayList zu der der infoValue hinzugefügt werden soll
+     * @param keyList   die ArrayList, die alle bisherigen infoKeys sammelt
+     */
     private void addToList(String infoKey, String infoValue, ArrayList<String> list, ArrayList<String> keyList) {
 
+        // Mit der HashMap legen wir die Reihenfolge der Informationen in der ArrayList fest.
+        // Sie enthält als Key-Value-Paar den infoKey und den ArrayList-Index.
         Map<String, Integer> infoMapping = new HashMap<>();
         infoMapping.put("title", 0);
         infoMapping.put("url", 1);
@@ -173,11 +201,59 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
         infoMapping.put("term_end", 18);
         infoMapping.put("party", 19);
 
+        // Wenn der infoKey nicht in der ArrayList infoKey enthalten ist, also zum ersten mal auftaucht,
+        // überschreiben wir den bisherigen Eintrag (NONE) an dem entsprechenden Index mit dem infoValue.
+        // Anschließend fügen wir den infoKey zur keyList hinzu.
         if (!keyList.contains(infoKey)) {
             int index = infoMapping.get(infoKey);
             list.set(index, infoValue);
             keyList.add(infoKey);
         }
+    }
+
+    /**
+     * Nach dem parsen des infoValues werden manchmal nicht alle geschweiften Klammern und ihr Inhalt entfernt.
+     * Die geschweifte Klammern enthalten für uns irrelevante Informationen, weshalb wir diese entfernen wollen.
+     * Diese Methode prüft, ob der infoValue noch geschweifte Klammern enthält. Wenn dies der Fall ist,
+     * wird der Inhalt der Klammern inklusive der geschweiften Klammern selbst entfernt.
+     *
+     * @param infoValue der infoValue, der die Personeninformation enthält
+     * @return den infoValue ohne geschweifte Klammern
+     */
+    private String curvedBracketTest(String infoValue) {
+        if (infoValue == null || infoValue.isEmpty()) {
+            return null;
+        }
+
+        // Solange der infoValue mindestens eine geöffnete und geschlossene Klammer enthält, werden diese und
+        // der Text dazwischen gelöscht.
+        while (infoValue.contains("{") && infoValue.contains("}")) {
+            infoValue = infoValue.replaceAll("\\{(.*?)\\}", "");
+        }
+
+        // Beispielsweise beim splitten passiert es manchmal, dass der infoValue nur noch eine Hälfte
+        // der Klammern enthält. Wenn der infoValue nur eine geöffnete Klammer enthält, splitten wir den infoValue
+        // bei dieser Klammer und geben nur den ersten String des String-Arrays zurück, da dies der Text links
+        // von der Klammer, also der Text außerhalb der Klammer ist. Analog dazu geben wir den zweiten String
+        // des String-Arrays zurück, wenn der infoValue nur eine geschlossene Klammer enthält.
+        if (infoValue.contains("{") && !infoValue.contains("}")) {
+            String[] textChunks = infoValue.split(Pattern.quote("{"));
+            if (textChunks.length == 0) {
+                return null;
+            }
+            return textChunks[0];
+        } else if (infoValue.contains("}") && !infoValue.contains("{")) {
+            String[] textChunks = infoValue.split(Pattern.quote("}"));
+            if (textChunks.length == 0) {
+                return null;
+            } else if (textChunks.length < 2) {
+                // Wenn der infoValue nicht gesplittet werden konnte, geben wir den ersten String zurück.
+                return textChunks[0];
+            }
+            return textChunks[1];
+        }
+
+        return infoValue;
     }
 
 
@@ -194,8 +270,9 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             return null;
         }
 
-        // Wenn der Inhalt von infoValue eine Plain- oder Flatlist ist, stehen die eigentlichen Informationen
-        // in den Zeilen danach. Daher ignorieren wir diese Information.
+        // Es existieren gewisse Elemente in den Wikipediaartikeln, bei denen die eigentlichen Informationen
+        // erst in den nächsten Zeilen stehen. Dazu gehören zb. plainlist und flatlist.
+        // Wir erstellen mit listNames eine Liste von solchen Begriffen.
         String[] listNames = {
                 "plainlist",
                 "flatlist",
@@ -205,34 +282,31 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 "flagicon"
         };
 
+        // Wenn ein infoValue, ein Begriff aus dem String-Array enthält, enthält er keine Informationen.
+        // Daher setzen wir den infoValue auf null.
         for (String list : listNames) {
             if (infoValue.toLowerCase().contains(list)) {
                 return null;
             }
         }
 
-
-        // In allen infoValues wird, wenn enthalten, XML Code gelöscht.
+        // Wenn XML Code in dem infoValue enthalten ist, wird dieser entfernt.
         infoValue = infoValue.replaceAll("\\<(.*?)\\>", " ");
 
+        // Eckige Klammern beschreiben in Wikipedia eine Verlinkung. Manchmal ist innerhalb der Verlinkung ein
+        // Pipe-Symbol. Der Inhalt vor dem Pipe-Symbol ist der Wikipediatitel auf den verlinkt wird, der Inhalt
+        // nach dem Pipe-Symbol ist der Text der angezeigt wird. Für den infoValue interessieren wir uns nur für
+        // den den Inhalt nach dem Pipe-Symbol, weshalb wir den Inhalt zwischen geöffneten Klammern und einem
+        // Pipe-Symbol entfernen. Anschließend entfernen wir die restlichen Klammern.
+        infoValue = infoValue.replaceAll("\\[\\[[^,\\]]+\\|", "")
+                .replace("[[", "").replace("]]", "");
 
-        String[] words = infoValue.split("]]");
-        StringBuilder infoValueBuilder = new StringBuilder();
-        for (String word : words) {
-            if (word.contains("|")) {
-                word = word.replaceAll("(?<=\\[\\[)(.*?)\\|", "");
-            }
-            word = word.replace("[[", "").replace("]]", "");
-            infoValueBuilder.append(word);
-        }
-        infoValue = infoValueBuilder.toString();
+        // Wir ersetzen, bzw. entfernen einige Zeichen, die im infoValue enthalten sein können.
         infoValue = infoValue.replace("{{circa}}", "ca.")
                 .replace("{{thinsp}}", " ")
                 .replaceAll("\\{\\{sup(.*?)\\}\\}", "");
 
-
-        // Je nach infoKey, führen wir verschiedene Operationen auf dem infoValue aus. Wenn es für den
-        // infoKey keinen Case gibt, wird der infoValue unverändert wieder zurückgegeben.
+        // Je nach infoKey, führen wir verschiedene Operationen auf dem infoValue aus.
         switch (infoKey) {
             case "image":
                 // Der infoValue enthält den Namen der Bilddatei. Wir ersetzen alle Leerzeichen durch
@@ -256,7 +330,10 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             case "name":
             case "birth_name":
             case "nationality":
-                // {{lang|fr|Name|optional}}
+                // Der infoValue kann folgendes Format haben: {{lang|fr|INFORMATION|optional}}
+                // Wir entfernen daher alles von den geöffneten Klammern bis zum zweiten Pipe-Symbol
+                // und löschen die geschlossenen Klammern. Wir splitten das Ergebnis beim Pipe-Symbol und
+                // geben das erste Element, was unsere Information ist, zurück.
                 infoValue = infoValue.replaceAll("\\{\\{(.*?)\\|(.*?)\\|", " ");
                 infoValue = infoValue.replace("}}", "");
                 String[] names = infoValue.split(Pattern.quote("|"));
@@ -269,16 +346,18 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             case "order":
             case "party":
             case "death_cause":
-            case "birth_place": //nowrap {{small|(now Israel)}}
-            case "death_place": // {{nowrap|Princeton, New Jersey, U.S.}}
-            case "known_for":  //{{nowrap|[[Invention of the telephone]]{{thinsp}}{{sup|b}}}}
-            case "occupation": //{{hlist|Novelist|[[short story writer]]|playwright|poet|memoirist}}
-                //{{hlist |Engineer |Professor{{thinsp}}{{sup|a}}}} {{ubl,csv
-                //{{Hlist | Occultist | poet | novelist | mountaineer }}>>>NEXT>>>education: {{unbulleted list|Malvern College|Tonbridge School|Eastbourne College}}
-            case "education": // {{unbulleted list|[[Malvern College]]|[[Tonbridge School]]|[[Eastbourne College]]}}
+            case "birth_place":
+            case "death_place":
+            case "known_for":
+            case "occupation":
+            case "education":
+                // Der infoValue kann folgendes Format haben: {{something|INFO|INFO|INFO|etc.}}
+                // Wir entfernen daher alles von den geöffneten Klammern bis zum ersten Pipe-Symbol und löschen
+                // die geschweiften Klammern. Die Pipe-Symbole ersetzen wir durch Kommas.
+                // Am Ende geben wir den infoValue eine Azurück, der nun eine Aufzählung enthält.
                 infoValue = infoValue.replaceAll("\\{\\{(.*?)\\|", "");
                 infoValue = infoValue.replace("}}", "")
-                        .replace("{{","")
+                        .replace("{{", "")
                         .replace("|", ", ");
                 return infoValue;
         }
@@ -320,9 +399,9 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             return null;
         }
 
-        // Wir legen unser gewünschtes Datumsformat als formatter fest.
+        // Wir legen unser gewünschtes Datenformat als formatter fest.
         SimpleDateFormat formatter = new SimpleDateFormat("G-y-MM-dd");
-        // Die patternList enthält die Datumsformate, die das gegebene Datum haben kann.
+        // Die patternList enthält die Datenformate, die das gegebene Datum haben kann.
         String[] patternList = {
                 "d MMM yyyy G",
                 "d MMM G yyyy",
@@ -334,7 +413,7 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
                 "yyyy|MM|d"
         };
 
-        // Wir versuchen für jedes Datumsformat das gegebene Datum zu parsen. Wenn das Datum geparst
+        // Wir versuchen für jedes Datenformat das gegebene Datum zu parsen. Wenn das Datum geparst
         // werden konnte, wird es formatiert und zurückgegeben.
         for (String pattern : patternList) {
             SimpleDateFormat parser = new SimpleDateFormat(pattern);
@@ -344,26 +423,36 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             } catch (ParseException ignored) {
             }
         }
+
+        // Wenn das Datum mit keinem der Datenformate geparst werden konnte, versuchen wir nur das Jahr
+        // zu parsen, da manche Personen nur ein ungefähres Geburtsjahr haben.
         return yearFormatter(date);
     }
 
 
+    /**
+     * Diese Methode formatiert Daten, die nur ein Jahr enthalten, in ein einheitliches Format.
+     *
+     * @param date das Datum, was formatiert werden soll
+     * @return das formatierte Datum
+     */
     private String yearFormatter(String date) {
+        // Wir extrahieren aus dem gegebenen Datum das Jahr und gegebenenfalls das Zeitalter (BC/AD).
         String year = extractSubstring(date, "(AD|BC)\\s\\d{1,4}|\\d{1,4}\\s(AD|BC)|\\d{1,4}");
         if (year == null || year.isEmpty()) {
             return null;
         }
 
-        // Wir legen unser gewünschtes Datumsformat als formatter fest.
+        // Wir legen unser gewünschtes Datenformat als formatter fest.
         SimpleDateFormat formatter = new SimpleDateFormat("G-y");
-        // Die patternList enthält die Datumsformate, die das gegebene Datum haben kann.
+        // Die patternList enthält die Datenformate, die das gegebene Datum haben kann.
         String[] patternList = {
                 "yyyy G",
                 "G yyyy",
                 "yyyy"
         };
 
-        // Wir versuchen für jedes Datumsformat das gegebene Datum zu parsen. Wenn das Datum geparst
+        // Wir versuchen für jedes Datenformat das gegebene Datum zu parsen. Wenn das Datum geparst
         // werden konnte, wird es formatiert und zurückgegeben.
         for (String pattern : patternList) {
             SimpleDateFormat parser = new SimpleDateFormat(pattern);
@@ -373,34 +462,8 @@ public class PersonDataMapper extends Mapper<Object, Text, Text, Text> {
             } catch (ParseException ignored) {
             }
         }
+
+        // Wenn das Datum mit keinem der Datenformate geparst werden konnte, geben wir null zurück.
         return null;
-    }
-
-
-    private String curvedBracketTest(String infoValue) {
-        if (infoValue == null || infoValue.isEmpty()) {
-            return null;
-        }
-
-        while (infoValue.contains("{") && infoValue.contains("}")) {
-            infoValue = infoValue.replaceAll("\\{(.*?)\\}","");
-        }
-
-        if (infoValue.contains("{") && !infoValue.contains("}")) {
-            String[] textChunks = infoValue.split(Pattern.quote("{"));
-            if (textChunks.length == 0) {
-                return null;
-            }
-            return textChunks[0];
-        } else if (infoValue.contains("}") && !infoValue.contains("{")) {
-            String[] textChunks = infoValue.split(Pattern.quote("}"));
-            if (textChunks.length == 0) {
-                return null;
-            } else if (textChunks.length < 2) {
-                return textChunks[0];
-            }
-            return textChunks[1];
-        }
-        return infoValue;
     }
 }
