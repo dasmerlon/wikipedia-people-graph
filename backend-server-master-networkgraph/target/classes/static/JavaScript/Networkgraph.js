@@ -1,6 +1,21 @@
-anychart.onDocumentReady(function () {
-    anychart.data.loadJsonFile('http://localhost:8080/JSONs/testdaten.json', function (data) {
+  var persons = "Angela Merkel";
+  var firstdate = "";
+  var enddate = "";
+  var profession = "";
 
+
+
+anychart.onDocumentReady(buildeMal());
+
+ function buildeMal() {
+    //anychart.data.loadJsonFile('http://localhost:8080/JSONs/testdaten.json', function (data) {
+
+
+        var container = document.getElementById("container");
+        container.innerHTML = "" ;
+
+
+    anychart.data.loadJsonFile('http://localhost:8080/users' + '?person=' + persons , function (data) {
 
         // create a chart from the loaded data
         var chart = anychart.graph(data);
@@ -36,4 +51,15 @@ anychart.onDocumentReady(function () {
         chart.draw();
     });
 
-});
+    chart.invalidate();
+
+};
+
+function getSubmitFields() {
+  persons = document.getElementById("PersonInput").value;
+  firstdate = document.getElementById("LivedFromInput").value;
+  enddate = document.getElementById("LivedUntilInput").value;
+  profession = document.getElementById("ProfessionInput").value;
+  buildeMal();
+
+}

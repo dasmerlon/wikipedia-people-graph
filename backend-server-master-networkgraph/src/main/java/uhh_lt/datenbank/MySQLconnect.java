@@ -32,7 +32,7 @@ public class MySQLconnect{
 	private static String dbName = "peoplegraph_prakt21";	// Datenbankname
 	private static String dbUser = "peoplegraph_prakt21";	// Datenbankuser
 	private static String dbPass = "W22$wqtF";				// Datenbankpasswort
-	private static String dbTable = "PersonData";	// Tabelle //PersonData PersonsStringDate
+	private static String dbTable = "Relationships";	// Tabelle //PersonData PersonsStringDate
 
 	/**
 	 * Stellt eine Verbindung zur Datenbank her.
@@ -101,7 +101,7 @@ public class MySQLconnect{
 	 * Liest Watson Daten aus der Datenbank aus und errechnet Durchschnittswerte für den Sentiment Score und die Emotions.
 	 * * @return ein double Array mit den Watson Werten in der Reihenfolge Sentiment, Sadness, Joy, Fear, Disgust, Anger
 	 */
-	public String getWatson(String person, String birthdate, String deathdate, String job) { //TODO PARAMETER MUESSEN NOCH IN DIE QUERY EINGEBAUT WERDEN
+	public String getWatson(String person) { //TODO PARAMETER MUESSEN NOCH IN DIE QUERY EINGEBAUT WERDEN
 
 		Statement st = null;
 		try {
@@ -122,40 +122,12 @@ public class MySQLconnect{
 			person = "=" + "'" + person + "'";
 		}
 
-		if(birthdate.equals(""))
-		{
-			birthdate = "!=" + "'" + birthdate + "'";
-		}
-
-		else
-		{
-			birthdate = "=" + "'" + birthdate + "'";
-		}
-		if(deathdate.equals(""))
-		{
-			deathdate = "!=" + "'" + deathdate + "'";
-		}
-
-		else
-		{
-			deathdate = "=" + "'" + deathdate + "'";
-		}
-		if(job.equals(""))
-		{
-			job = "!=" + "'" + job + "'";
-		}
-
-		else
-		{
-			job = "=" + "'" + job + "'";
-		}
-
 
 
 
 		//String X = "'Julius Caesar'";
 		//String sql = ("SELECT * FROM " + dbTable + " WHERE TITLE=" + X + ";");
-		String sql = ("SELECT * FROM " + dbTable + " WHERE OCCUPATION" +  job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person +" ;");
+		String sql = ("SELECT * FROM " + dbTable + " WHERE PERSON1" +  person +" ;");
 		// "SELECT * FROM " + dbTable + " WHERE TITLE = 'Abraham Lincoln';"
 
 		//String sql = ("SELECT * FROM " + dbTable + " WHERE BIRTH_DATE" + birthdate +" AND DEATH_DATE" + deathdate + " AND TITLE" + person + " AND OCCUPATION" + job +" ;");
