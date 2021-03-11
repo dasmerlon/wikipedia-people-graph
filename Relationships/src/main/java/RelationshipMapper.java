@@ -84,11 +84,18 @@ public class RelationshipMapper extends Mapper<Object, Text, Text, Text> {
 
             boolean hasBrackets = line.startsWith("{{") || line.startsWith("}}");
             boolean hasSymbols = line.startsWith("|") || line.startsWith("*") || line.startsWith("=");
-            //TODO: poly, contains(alt=
 
-            if (line.startsWith("<") || hasBrackets || hasSymbols || !line.contains("[[") || title == null) {
+            if (!line.contains("[[")
+                    || hasBrackets
+                    || hasSymbols
+                    || line.startsWith("<")
+                    || title == null
+                    || line.startsWith("poly")
+                    || line.contains("alt=")
+                    || line.contains(("File:"))) {
                 continue;
             }
+
 
             String[] sentences = line.split("\\.\\s+(?=[A-Z])");
             for (String sentence : sentences) {
@@ -98,7 +105,10 @@ public class RelationshipMapper extends Mapper<Object, Text, Text, Text> {
                     String person = link.split("\\|")[0];
                     if (names.contains(person) && !relationships.contains(person)) {
                         relationships.add(person);
-                        relationship.set(title + ">>>>" + person + ">>>>" + sentence);
+                        String cleanSentence = sentence.replaceAll("(?<=\\[\\[)[^,\\]]+\\|", "");
+                        cleanSentence = cleanSentence.replace("[[", "")
+                                .replace("]]", "").replace("'", "");
+                        relationship.set(title + ">>>>" + person + ">>>>" + cleanSentence + ".");
                         context.write(relationship, none);
                     }
                 }
