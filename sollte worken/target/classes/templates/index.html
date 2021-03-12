@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.80.0">
+  <title>Dashboard Template · Bootstrap v5.0</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
+
+
+
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+
+  <!-- Custom styles for this template -->
+  <link href="css/dashboard.css" rel="stylesheet">
+
+
+  <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-bundle.min.js"> </script>
+  <script src ="https://cdn.anychart.com/releases/8.6.0/js/anychart-gantt.min.js"></script>
+
+
+</head>
+<body>
+
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Company name</a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <ul class="navbar-nav px-3">
+    <li class="nav-item text-nowrap">
+      <a class="nav-link" href="#">Sign out</a>
+    </li>
+  </ul>
+</header>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">
+              <span data-feather="home"></span>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file"></span>
+              Orders
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="shopping-cart"></span>
+              Products
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="users"></span>
+              Customers
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="bar-chart-2"></span>
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="layers"></span>
+              Integrations
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Saved reports</span>
+          <a class="link-secondary" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Current month
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Last quarter
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Social engagement
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Year-end sale
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Wikipedia People Timeline</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <span data-feather="calendar"></span>
+            This week
+          </button>
+        </div>
+      </div>
+
+      <!--<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>-->
+
+      <button id="zoomInButton" onclick="zoomIn()">+</button>
+      <button id="zoomOutButton" onclick="zoomOut()">-</button>
+      <label>zoom factor: 2</label>
+      <br>
+      <br>
+     <!-- <button id="zoomToDatesButton" onclick="zoomToDates()">Zoom To Dates</button>
+      <label>start date:</label>
+      <label id="dateLabel1">03 February 2018</label>
+      <label>end date: </label>
+      <label id="dateLabel2">06 February 2018</label>
+      <br>
+      <button id="zoomToUnitsButton" onclick="zoomToUnits()">Zoom To Units</button>
+      <label for="unitSelect">unit: </label>
+      <select id="unitSelect">
+        <option value="millisecond">millisecond</option>
+        <option value="second">second</option>
+        <option value="minute">minute</option>
+        <option value="hour">hour</option>
+        <option value="day">day</option>
+        <option value="week" selected>week</option>
+        <option value="third-of-month">third-of-month</option>
+        <option value="month">month</option>
+        <option value="quarter">quarter</option>
+        <option value="semester">semester</option>
+        <option value="year">year</option></select>
+      <label>count: <input id="countInput" value="2"></label>
+      <label for="anchorSelect">anchor: </label>
+      <select id="anchorSelect">
+        <option value="first-date" selected>first-date</option>
+        <option value="first-visible-date">first-visible-date</option>
+        <option value="last-date">last-date</option>
+        <option value="last-visible-date">last-visible-date</option>
+      </select>
+      <br>-->
+
+      <button id="SubmitInput" onclick="getSubmitFields()">Search!</button>
+      <label>Person: <input type="text" id="PersonInput"></label>
+      <label>Profession: <input type="text" id="ProfessionInput" value="Politics" ></label>
+      <label>Lived from : <input type="date" id="LivedFromInput" ></label>
+      <label>Lived until : <input type="date" id="LivedUntilInput" ></label>
+      <br>
+      <br>
+
+
+
+      <!--hier ist die Box für den graph -->
+        <div id = "container" style="height: 500px;"> </div>
+
+
+
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+      <script src="JavaScript/anychart_gantt.js">
+      </script>
+
+      <h2>Click for Infos about the person</h2>
+      <div id="TextDisplay" class="text"> <!--class="paragraph"-->
+
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<script src="JavaScript/bootstrap.bundle.min.js"></script>
+
+<!--
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script><script src="JavaScript/dashboard.js"></script>
+-->
+</body>
+</html>

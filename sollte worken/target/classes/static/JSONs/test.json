@@ -1,0 +1,38 @@
+[
+
+
+{
+  "id": "1",
+  "name": "Dschingis Khan",
+  "birth_date": "1112-02-07",
+  "death_date": "1178-01-05",
+  "info": "Dischingis Khan konnte ganz gut mit Bögen und Pferden."
+},
+{
+"id": "2",
+"name": "Mahad Ma Gandi",
+"birth_date": "1920-09-11",
+"death_date": "1980-08-07",
+"info": "Hat so viel Yoga gemacht, dass es für ne Revolution reichte."
+},
+{
+"id": "3",
+"name": "Rainer Kallmund",
+"birth_date": "1970-10-11",
+"info": "Rainer Kallmund ist ein deutscher Fußballfunktionär und Lebemann."
+},
+{
+"id": "4",
+"name": "Rainer Schmallmund",
+"birth_date": "1971-10-11",
+"info": "Rainer Kallmund ist ein deutscher Fußballfunktionär und Lebemann."
+},
+
+  {
+    "id": "5",
+    "name": "Kainer Schmallmund",
+    "birth_date": "1971-10-11",
+    "info": "Rainer Kallmund ist ein deutscher Fußballfunktionär und Lebemann."
+  }
+
+]

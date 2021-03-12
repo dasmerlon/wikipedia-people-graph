@@ -28,7 +28,6 @@
     </dependencies>
 
     <build>
-        <!-- <finalName>APP</finalName> -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -38,7 +37,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>PersonData</mainClass>
+                            <mainClass>PersonArticleExtractor</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

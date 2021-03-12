@@ -19,6 +19,9 @@ public class TitleExtractor {
      * Mappers und des Input-Formats an. Außerdem legen wir hier fest, dass es keinen Reduce Job gibt.
      */
     public static void main(String[] args) throws Exception {
+
+        // Wir setzen in der Konfiguration fest, dass der Mapper-Input mit <page> beginnt und </page> endet.
+        // Somit bekommt der Mapper immer eine ganze Wikipediaseite als Input.
         Configuration conf = new Configuration();
         conf.set("xmlInput.start", "<page>");
         conf.set("xmlInput.end", "</page>");
@@ -37,6 +40,5 @@ public class TitleExtractor {
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);
-
     }
 }

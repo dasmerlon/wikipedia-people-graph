@@ -36,17 +36,20 @@ public class TitleMapper extends Mapper<Object, Text, Text, Text> {
         for (String line : lines) {
             line = line.trim();
 
-            // Wir prüfen, ob die Zeile den Titel enthält und setzen diesen als Output Key,
-            // nachdem wir das XML aus der Zeile entfernt haben.
+            // Es gibt Sandboxseiten, die wir herausfiltern wollen. Diese Seiten haben im Titel den Wikipedia-User
+            // angegeben. Wenn es sich also um eine Sandboxseite handelt, bearbeiten wir diese Seite nicht weiter.
+            if (line.startsWith("<title>") && line.toLowerCase().contains("user:")) {
+                return;
+            }
+
+            // Wir prüfen, ob die Zeile den Titel enthält. Wenn dies der Fall ist, entfernen wir das XML und
+            // geben den Titel als Output Key aus. Der Output Value ist ein leeres Text-Objekt.
             if (line.startsWith("<title>")) {
                 String title = line.replace("<title>", "");
                 title = title.replace("</title>", "");
                 pageTitle.set(title);
-                continue;
+                context.write(pageTitle, empty);
             }
         }
-        
-        // Der Titel wird als Output Key übergeben. Der Output Value ist ein leeres Text-Objekt.
-        context.write(pageTitle, empty);
     }
 }

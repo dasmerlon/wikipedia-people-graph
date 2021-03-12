@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
  * Dies ist eine gekürzte Version des XmlInputFormats von Thomas P. Moyer:
  * https://tpmoyer-gallery.appspot.com/hadoopWikipedia
  * Wir benutzen dieses InputFormat, damit der Mapper immer einen kompletten und unveränderten
- * Wikipediaartikel übergeben bekommt.
+ * Wikipediaartikel übergeben bekommt. In der Klasse Relationships legen wir den Start- und Endtag fest.
  * <p>
  * Reads records that are delimited by a specific begin/end tag.
  * Correctly handles case where xmlInput.start and xmlInput.end span
