@@ -25,8 +25,8 @@ public class PersonArticleExtractor {
         // Wir setzen in der Konfiguration fest, dass der Mapper-Input mit <page> beginnt und </page> endet.
         // Somit bekommt der Mapper immer eine ganze Wikipediaseite als Input.
         Configuration conf = new Configuration();
-        conf.set("xmlinput.start", "<page>");
-        conf.set("xmlinput.end", "</page>");
+        conf.set("xmlInput.start", "<page>");
+        conf.set("xmlInput.end", "</page>");
 
         Job job = Job.getInstance(conf, "personArticle");
         job.setJarByClass(PersonArticleExtractor.class);
