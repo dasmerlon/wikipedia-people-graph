@@ -3,15 +3,15 @@
 
 Hi!
 
-This project is a the result of a practical training of our university (Universität Hamburg). \
-The goal of the project is to create a tool to interactivly explore the relationships between People listed on Wikipedia.
+This project is the result of a practical training of our university (Universität Hamburg). \
+The goal of the project is to create a tool to interactively explore the relationships between People listed on Wikipedia.
 
-Everything is based on Wikimedia's regular database dumps of the English , which can be found [here](https://dumps.wikimedia.org/enwiki/).
+Everything is based on Wikimedia's regular database dumps of the English, which can be found [here](https://dumps.wikimedia.org/enwiki/).
 
 
-# Project Struture
+# Project Structure
 
-The whole project is devided into two sub projects.
+The whole project is divided into two subprojects.
 
 1. Hadoop Jobs, which extract all necessary and interesting information from the Wikimedia dumps.
 2. A web server, for interactive exploration.
@@ -40,13 +40,13 @@ This job is located at `./mapreduce-jobs/PersonData`. \
 Wikimedia has various notations for metadata, which allows us to extract this data with a semi-sophisticated parser.
 
 The result set is a collection of information for all people on Wikipedia.
-It's a simple CSV file with some special formatting and a pre-defined field order.
+It's a simple CSV file with some special formatting, and a pre-defined field order.
 
 For more information, please look into the PersonData project's code.
 
 ## TitleExtractor and Relationships
 
-These jobs are strongly connected. Their locations are `./mapreduce-jobs/TitleExtractor` and `./mapreduce-jobs/Relationships`. \
+These jobs are strongly connected. Their locations are `./mapreduce-jobs/TitleExtractor` and `./mapreduce-jobs/Relationships`.
 
 At first, the TitleExtractor is run. This job simply returns a file with all titles of all Articles. \
 The idea behind this, is that the title of an article can be seen as the primary key of an article.
@@ -62,7 +62,7 @@ If a link points to that person, a new relationship is created.
 ## Hadoop jobs
 
 All Hadoop jobs are built with Maven. \
-It's highly recommended to build the project via the IntelliJ IDEA editor, since this is the way this project has been developed!
+It's highly recommended building the project via the IntelliJ IDEA editor, since this is the way this project has been developed!
 
 1. Open the project.
 2. Run maven compilation steps
@@ -125,7 +125,7 @@ In the following, we expect that you have:
 
 ### Relationships
 
-To use the `titles.txt` of the TitleExtractor, you have to adjust the Hadoop cacheFile path in `./mapreduce-jobs/Relationships/src/main/java/Relationships.java`. \
+To use the `titles.txt` of the TitleExtractor, you have to adjust the Hadoop cacheFile path in `./mapreduce-jobs/Relationships/src/main/java/Relationships.java`.
 
 Change the line, so it fits your local environment:
 ```
@@ -142,4 +142,4 @@ Then build the file and upload it as described in the `Deployment` section.
     ```
     hadoop fs -getmerge $OUTPUT/Relationships relationship.csv
     hadoop fs -copyFromLocal relationship.csv OUTPUT/relationship.csv
-    ``
+    ```
