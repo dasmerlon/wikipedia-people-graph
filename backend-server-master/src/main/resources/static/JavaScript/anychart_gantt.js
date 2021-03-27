@@ -125,9 +125,16 @@
     chart.listen("rowClick", function (e) {
       var itemName = e.item.get("SHORT_DESCRIPTION");
       var imgLink = e.item.get("IMAGE");
-      var imgLink = "'" + imgLink + "'";
 
-      document.getElementById("TextDisplay").innerHTML = itemName + "<img> src=" + imgLink;
+
+
+      document.getElementById("TextDisplay").innerHTML = itemName;
+
+      document.getElementById("PictureDisplay").src= imgLink;
+
+
+
+
     });
 
 
