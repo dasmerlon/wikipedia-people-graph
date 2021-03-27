@@ -3,6 +3,7 @@
   var enddate = "";
   var profession = "Politics";
 
+  var chart;
   //anychart.onDocumentReady(function buildeMal() {
 
   anychart.onDocumentReady(buildeMal());
@@ -85,7 +86,7 @@
     // var mapping = treeData.mapAs({name: "Name", actualStart: "Birthdate", actualEnd: "Deathdate"}); //evtl. NAME statt TITLE?
 
     // create a chart
-    var chart = anychart.ganttProject(data);
+    chart = anychart.ganttProject(data);
 
     //CLICKIBUNTI
     chart.background("#64b5f6 0.2");
@@ -173,8 +174,8 @@
 
 
 // set the minimum and maximum values of the scale
-    chart.getTimeline().scale().minimum("0000-01-01");
-    chart.getTimeline().scale().maximum("2030-01-01");
+    //chart.getTimeline().scale().minimum("0100-01-01");
+    chart.getTimeline().scale().maximum("2022-01-01");
 
     // set the container id
     chart.container("container");
@@ -182,7 +183,9 @@
         // set zoom levels of the scale
     chart.getTimeline().scale().zoomLevels([
       [
-        {unit: "year", count: 40},
+        {unit: "year", count: 50},
+        {unit: "year", count: 10},
+        {unit: "year", count: 1}
 
       ]
     ]);
@@ -194,19 +197,25 @@
     chart.fitAll();
         });
 
-     chart.invalidate();
+     //chart.invalidate(); // scheint auch ohne zu funktionieren
+
+
+
+
 
  };
 
-// zoom the timeline in
-function zoomIn() {
-  chart.zoomIn(2);
-}
+ // zoom the timeline in
+     function zoomIn() {
+       chart.zoomIn(2);
+     }
 
-// zoom the timeline out
-function zoomOut() {
-  chart.zoomOut(2);
-}
+     // zoom the timeline out
+     function zoomOut() {
+       chart.zoomOut(2);
+     }
+
+
 
 // zoom the timeline to the given dates
 function zoomToDates() {
