@@ -1,5 +1,5 @@
 package basecamp.project.server.controller;
-
+//PORT FORWARDING EINRICHTEN !! vorher!
 
 import org.json.JSONArray;
 import org.json.JSONException;
