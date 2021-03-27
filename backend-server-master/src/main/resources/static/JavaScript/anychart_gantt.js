@@ -118,12 +118,12 @@
         chart.getTimeline().milestones().labels().enabled(false);
 
     // set the position of the splitter
-    chart.splitterPosition("10%");
+    chart.splitterPosition("17%");
 
     /* listen to the rowClick event
     and update the chart title */
     chart.listen("rowClick", function (e) {
-      var itemName = e.item.get("SHORT_DESCRIPTION");
+      var itemName = e.item.get("TITLE") + "<br />Profession: " + e.item.get("OCCUPATION") + " <br /> Short Description: " + e.item.get("SHORT_DESCRIPTION");
       var imgLink = e.item.get("IMAGE");
 
 

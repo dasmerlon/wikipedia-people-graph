@@ -101,7 +101,7 @@ public class MySQLconnect{
 	 * Liest Watson Daten aus der Datenbank aus und errechnet Durchschnittswerte für den Sentiment Score und die Emotions.
 	 * * @return ein double Array mit den Watson Werten in der Reihenfolge Sentiment, Sadness, Joy, Fear, Disgust, Anger
 	 */
-	public String getWatson(String person, String birthdate, String deathdate, String job) { //TODO PARAMETER MUESSEN NOCH IN DIE QUERY EINGEBAUT WERDEN
+	public String getWatson(String person, String birthdate, String deathdate, String job) {
 
 		Statement st = null;
 		try {
@@ -119,7 +119,7 @@ public class MySQLconnect{
 
 		else
 		{
-			person = "=" + "'" + person + "'";
+			person = " LIKE" + "'%" + person + "%'";
 		}
 
 		if(birthdate.equals(""))
@@ -129,8 +129,8 @@ public class MySQLconnect{
 
 		else
 		{
-			birthdate = "=" + "'" + birthdate + "'";
-		}
+			birthdate = "=" + "'" + birthdate + "'"; //Geburts und Todesdatum sind in der DB leider als String gespeichert, daher können wir keine "Zeitbereiche" eingrenzen...
+		}											//TODO Genaues Datum funktioniert aber auch nicht, in welchem Format liegt das Datum in der DB vor? Ansonsten die Buttons lieber löschen
 		if(deathdate.equals(""))
 		{
 			deathdate = "!=" + "'" + deathdate + "'";
@@ -147,7 +147,7 @@ public class MySQLconnect{
 
 		else
 		{
-			job = "=" + "'" + job + "'";
+			job = " LIKE" + "'%" + job + "%'";
 		}
 
 
@@ -155,7 +155,7 @@ public class MySQLconnect{
 
 		//String X = "'Julius Caesar'";
 		//String sql = ("SELECT * FROM " + dbTable + " WHERE TITLE=" + X + ";");
-		String sql = ("SELECT * FROM " + dbTable + " WHERE OCCUPATION" +  job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person +" ;");
+		String sql = ("SELECT * FROM " + dbTable + " WHERE OCCUPATION" +  job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person + " LIMIT 10000"+" ;");
 		// "SELECT * FROM " + dbTable + " WHERE TITLE = 'Abraham Lincoln';"
 
 		//String sql = ("SELECT * FROM " + dbTable + " WHERE BIRTH_DATE" + birthdate +" AND DEATH_DATE" + deathdate + " AND TITLE" + person + " AND OCCUPATION" + job +" ;");
@@ -164,7 +164,7 @@ public class MySQLconnect{
 		//String sql = ("SELECT * FROM " + dbTable + "WHERE TITLE = "Julius Caesar" LIMIT 10"+" ;"); //"SELECT * FROM " + dbTable + " WHERE TITLE = 'Abraham Lincoln';"
 		//ResultSet rs = null;
 		ResultSet rs = null;
-		//TODO eventuell als JSONARRAY anpassen
+
 		try {
 			rs = st.executeQuery(sql);
 			JSONArray jsonReceived = uhh_lt.datenbank.ResultSetConverter.convert(rs);
