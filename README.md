@@ -157,7 +157,10 @@ Then build the file and upload it as described in the `Deployment` section.
 
 1. Setup up a MySQL Instance.
 2. Create a new database. 
-3. Create our schema by simply running `cat schema.sql | mysql $YOUR_DB_NAME`.
+3. Create the schema by simply running:
+   ```
+   cat schema.sql | mysql $YOUR_DB_NAME
+   ```
 
 ### Data Import
 
