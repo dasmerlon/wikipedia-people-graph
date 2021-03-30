@@ -1,84 +1,88 @@
 package basecamp.project.server.controller;
 
-//import org.json.JSONArray;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
-
-import java.sql.SQLException;
-// import uhh_lt.datenverarbeitung.Verarbeitung;
-// vermutlich nur daten ummodeln
+//import uhh_lt.datenverarbeitung.Verarbeitung; //vermutlich nur daten ummodeln
 
 
 @RestController
 @RequestMapping("/graph_data")
 public class GraphController {
 
-    @Value("${service.key}")
-    private String key;
-
     @GetMapping
     public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person) throws Exception {
+
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");
 
         String jsonout = con.getRelationships(person);
-        String jsonProcessed = converter(jsonout);
+
+        String jsonProcessed = converter(jsonout, true);
+
         return jsonProcessed;
     }
 
-    public String converter(String jsonStr) throws JSONException, ParseException {
+    public String converter(String jsonStr, Boolean layer0) throws Exception {
 
         System.out.println("CONVERTER INPUT " + jsonStr);
 
         JSONParser parser = new JSONParser();
-        JSONArray inputArray = (JSONArray) parser.parse(jsonStr);
 
-        System.out.println("NACH PARSEN " + inputArray);
+        //JSONArray inputArray = (JSONArray) parser.parse(jsonStr);
+        JSONArray inputArray = new JSONArray(jsonStr);
+        //new JSONArray(jsonStr);
+
+        //System.out.println("NACH PARSEN " + inputArray);
 
         JSONArray nodesArray = new JSONArray();
         JSONArray edgesArray = new JSONArray();
-        JSONArray contactPersonArray = new JSONArray();
+        JSONArray contactPersonArray = new JSONArray(); // wird noch gebraucht?
 
         //build nodes
-        for (Object o : inputArray) {
 
-            JSONObject o2 = (JSONObject) o;
+        for (int i = 0; i < inputArray.length(); i++) {
+
+            JSONObject o2 = inputArray.getJSONObject(i);
 
             //String neueId1 = ((JSONObject) o).getString("PERSON2");
             String neueId1 = (String) o2.get("PERSON2");
-            System.out.println("PERSON 2 ziehen" + (String) o2.get("PERSON2") + neueId1);
+            //System.out.println("PERSON 2 ziehen" + (String) o2.get("PERSON2") + neueId1 );
             JSONObject node1 = new JSONObject();
 
             node1.put("id", neueId1);
 
-            System.out.println("node1 Objekt" + node1);
+            //System.out.println("node1 Objekt" + node1);
+            nodesArray.put(node1);
 
-            nodesArray.add(node1);
-            contactPersonArray.add(neueId1);
+            JSONObject contactObj = new JSONObject();
+            contactObj.put("ContactName", neueId1);
+            contactPersonArray.put(contactObj);
+
+            //contactPersonArray.add(neueId1);
 
             String neueId2 = (String) o2.get("PERSON1");
             JSONObject node2 = new JSONObject();
-
             node2.put("id", neueId2);
-            nodesArray.add(node2);
+
+            nodesArray.put(node2);
+
+            inputArray.getJSONObject(i);
         }
 
-        System.out.println("NODE ARRAY " + nodesArray);
+        //System.out.println("NODE ARRAY " + nodesArray);
 
         //build edges
-        for (Object o : inputArray) {
-
-            JSONObject o2 = (JSONObject) o;
+        for (int i = 0; i < inputArray.length(); i++) {
+            JSONObject o2 = inputArray.getJSONObject(i);
 
             //String neueId1 = ((JSONObject) o).getString("PERSON2");
             String neueId1 = (String) o2.get("PERSON2");
@@ -87,100 +91,135 @@ public class GraphController {
             edge.put("from", neueId1);
             edge.put("to", neueId2);
 
-            edgesArray.add(edge);
+            edgesArray.put(edge);
         }
+
 
         JSONObject obj = new JSONObject();
 
         obj.put("nodes", nodesArray);
+
         obj.put("edges", edgesArray);
+
 
         System.out.println("JSON OBJECT " + obj);
         System.out.println("JSON OBJECT TO STRING " + obj.toString());
+        System.out.println("contactPersonArray " + contactPersonArray);
 
-        //JSONObject out = getContactPersons(obj);
-        return obj.toString();
-    }
 
-    /**
-     * INPUT JSON DIREKT AUS DB
-     */
-    public JSONObject getContactPersons(JSONObject jsonStr) throws Exception {
-        System.out.println("CONVERTER INPUT " + jsonStr);
-        JSONObject layer0Output = jsonStr;
+        if (layer0 == true) {
 
-        String newjsonStr = jsonStr.toString();
+            JSONObject out = getSecondLayer(contactPersonArray, obj);
 
-        JSONParser parser = new JSONParser();
-        JSONArray inputArray = (JSONArray) parser.parse(newjsonStr);
-
-        System.out.println("NACH PARSEN " + inputArray);
-
-        JSONArray contactPersonArray = new JSONArray();
-
-        //build nodes
-        for (Object o : inputArray) {
-
-            JSONObject o2 = (JSONObject) o;
-
-            //String neueId1 = ((JSONObject) o).getString("PERSON2");
-            String neueId1 = (String) o2.get("PERSON2");
-            System.out.println("PERSON 2 ziehen" + (String) o2.get("PERSON2") + neueId1);
-
-            JSONObject contactObj = new JSONObject();
-            contactObj.put("ContactName", neueId1);
-
-            contactPersonArray.add(contactObj);
+            return out.toString();
+        } else {
+            return obj.toString();
         }
+        //return obj.toString() ;
 
-        JSONObject out = getSecondLayer(contactPersonArray, layer0Output);
-        return (out);
     }
+
+
+	/*public JSONObject getContactPersons(JSONObject jsonStr) throws JSONException, ParseException { //INPUT JSON DIREKT AUS DB
+		System.out.println("CONVERTER INPUT " + jsonStr);
+		JSONObject layer0Output = jsonStr;
+
+		//String newjsonStr = jsonStr.toString();
+
+
+		String neujsonStr = jsonStr.toString();
+		neujsonStr = neujsonStr.substring( 1, neujsonStr.length() - 1 ) ;
+
+		JSONArray inputArray = new JSONArray(neujsonStr) ;
+
+		//JSONArray inputArray = parser.parse(newjsonStr);
+		//new JSONArray(jsonStr);
+
+		System.out.println("NACH PARSEN " + inputArray);
+
+		JSONArray contactPersonArray = new JSONArray();
+
+		//build nodes
+
+		for(Object o: inputArray){
+
+			JSONObject o2 = (JSONObject)o;
+
+			//String neueId1 = ((JSONObject) o).getString("PERSON2");
+			String neueId1 = (String) o2.get("PERSON2");
+			System.out.println("PERSON 2 ziehen" + (String) o2.get("PERSON2") + neueId1 );
+
+			JSONObject contactObj = new JSONObject();
+			contactObj.put("ContactName", neueId1);
+
+			contactPersonArray.add(contactObj);
+
+		}
+
+
+		JSONObject out = getSecondLayer(contactPersonArray, layer0Output);
+		return (out);
+
+	}*/
 
 
     public JSONObject getSecondLayer(JSONArray nodesLayer1, JSONObject layer0Ausgabe) throws Exception //INPUT CONTACT PERSON ARRAY
     {
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");
-
         JSONArray alleDatenLayer2 = new JSONArray();
 
-        for (Object o : nodesLayer1) {
-            JSONObject o2 = (JSONObject) o;
+
+        for (int i = 0; i < nodesLayer1.length(); i++) {
+            JSONObject o2 = nodesLayer1.getJSONObject(i);
             String nextPerson = (String) o2.get("ContactName");
 
             String jsonout = con.getRelationships(nextPerson); //hole Beziehungen aus DB
-            String jsonProcessed = converter(jsonout); //get Objekt mit nodes Array und egdes Array
-            alleDatenLayer2.add(jsonProcessed);
+            String jsonProcessed = converter(jsonout, false); //get Objekt mit nodes Array und egdes Array
+            JSONObject processedobj = new JSONObject(jsonProcessed);
+            alleDatenLayer2.put(processedobj);
+
         }
+
 
         JSONArray allNodes = new JSONArray();
         JSONArray allEdges = new JSONArray();
 
-        //alleDatenLayer2 IST ZUSAMMENGEFUEGT AUS AUS CONVERTER OUTPUTS
-        for (Object o : alleDatenLayer2) {
-            JSONObject o2 = (JSONObject) o;
-            JSONArray nodesInO = (JSONArray) o2.get("nodes");
-            JSONArray edgesInO = (JSONArray) o2.get("edges");
 
-            for (Object p : nodesInO) {
-                String nextPerson = (String) o2.get("id");
+        for (int i = 0; i < alleDatenLayer2.length(); i++) {      //alleDatenLayer2 IST ZUSAMMENGEFUEGT AUS AUS CONVERTER OUTPUTS
+			/*JSONObject o2 = parser.parse(o);
+			JSONArray nodesInO = (JSONArray) o2.get("nodes");
+			JSONArray edgesInO = (JSONArray) o2.get("edges");*/
+
+            JSONObject o3 = alleDatenLayer2.getJSONObject(i);
+
+            JSONArray nodesInO = (JSONArray) o3.get("nodes");
+            JSONArray edgesInO = (JSONArray) o3.get("edges");
+
+
+            for (int j = 0; j < nodesInO.length(); j++) {
+                String nextPerson = (String) nodesInO.getJSONObject(j).get("id");
 
                 JSONObject lulu = new JSONObject();
                 lulu.put("id", nextPerson);
-                allNodes.add(lulu);
+                allNodes.put(lulu);
             }
 
-            for (Object p : edgesInO) {
-                String fromPerson = (String) o2.get("from");
-                String toPerson = (String) o2.get("to");
+
+            for (int z = 0; z < edgesInO.length(); z++) {
+
+                String fromPerson = (String) edgesInO.getJSONObject(z).get("from");
+                String toPerson = (String) edgesInO.getJSONObject(z).get("to");
 
                 JSONObject lala = new JSONObject();
                 lala.put("from", fromPerson);
                 lala.put("to", toPerson);
-                allEdges.add(lala);
+                allEdges.put(lala);
+
             }
+
         }
+
 
         JSONObject moddedjson = new JSONObject();
         moddedjson.put("nodes", allNodes);
@@ -189,8 +228,12 @@ public class GraphController {
         JSONObject out = MergeLayer0AndLayer1(moddedjson, layer0Ausgabe);
 
         return (out);
+
         //     alleDatenLayer2 = [ { nodes:[{},{},{}], edges:[{},{},{}] } ,    { nodes:[{},{},{}], edges:[{},{},{}] } ]
+
         //            = { allnodes:[{},{},{}], alledges:[{},{},{}] }
+
+
     }
 
     public JSONObject MergeLayer0AndLayer1(JSONObject NodesEdgesLayer1, JSONObject NodesEdgesLayer0) throws JSONException, ParseException {
@@ -208,40 +251,51 @@ public class GraphController {
         JSONArray nodesInLayer1 = (JSONArray) o3.get("nodes");
         JSONArray edgesInLayer1 = (JSONArray) o3.get("edges");
 
-        for (Object p : nodesInLayer0) {
-            String nextPerson = (String) o2.get("id");
+
+        for (int i = 0; i < nodesInLayer0.length(); i++) {
+
+            String nextPerson = (String) nodesInLayer0.getJSONObject(i).get("id");
 
             JSONObject lulu = new JSONObject();
             lulu.put("id", nextPerson);
-            nodesComplete.add(lulu);
+            nodesComplete.put(lulu);
+
         }
 
-        for (Object p : edgesInLayer0) {
-            String fromPerson = (String) o2.get("from");
-            String toPerson = (String) o2.get("to");
+        for (int i = 0; i < edgesInLayer0.length(); i++) {
+
+            String fromPerson = (String) edgesInLayer0.getJSONObject(i).get("from");
+            String toPerson = (String) edgesInLayer0.getJSONObject(i).get("to");
 
             JSONObject lala = new JSONObject();
             lala.put("from", fromPerson);
             lala.put("to", toPerson);
-            edgesComplete.add(lala);
+            edgesComplete.put(lala);
+
         }
 
-        for (Object p : nodesInLayer1) {
-            String nextPerson = (String) o2.get("id");
+
+        for (int i = 0; i < nodesInLayer1.length(); i++) {
+
+            String nextPerson = (String) nodesInLayer1.getJSONObject(i).get("id");
 
             JSONObject lulu = new JSONObject();
             lulu.put("id", nextPerson);
-            nodesComplete.add(lulu);
+            nodesComplete.put(lulu);
         }
 
-        for (Object p : edgesInLayer1) {
-            String fromPerson = (String) o2.get("from");
-            String toPerson = (String) o2.get("to");
+
+        for (int i = 0; i < edgesInLayer1.length(); i++) {
+
+            String fromPerson = (String) edgesInLayer1.getJSONObject(i).get("from");
+            String toPerson = (String) edgesInLayer1.getJSONObject(i).get("to");
 
             JSONObject lala = new JSONObject();
             lala.put("from", fromPerson);
             lala.put("to", toPerson);
-            edgesComplete.add(lala);
+            edgesComplete.put(lala);
+
+
         }
 
         JSONObject out = new JSONObject();
