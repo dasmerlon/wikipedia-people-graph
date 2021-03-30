@@ -23,22 +23,4 @@ public class IndexController {
 
         return "index";
     }
-
-
-    @RequestMapping(value = {"/hello"}, method = RequestMethod.GET)
-    public String hellotest(Model model, @RequestParam(defaultValue = "User") String name) {
-
-        model.addAttribute("name", name);
-
-        return "hello";
-    }
-
-
-    @RequestMapping(value = {"/hello2"}, method = RequestMethod.GET)
-    public String helloAgain(Model model, @RequestParam(name = "name", defaultValue = "User") String n) {
-
-        model.addAttribute("name", n);
-
-        return "hello";
-    }
 }
