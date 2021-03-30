@@ -54,7 +54,7 @@ public class MySQLconnect {
 
             String URI = String.format("jdbc:mysql://%s:%s/%s?useSSL=false", dbHost, dbPort, dbName);
 
-            System.out.println("Try to connect to %s with user %s and pass %s");
+            System.out.printf("Try to connect to %s with user %s and pass %s%n", URI, dbUser, dbHost);
 
             // Get Database connection
             con = DriverManager.getConnection(URI, dbUser, dbPass);
@@ -63,9 +63,9 @@ public class MySQLconnect {
             System.out.println("Couldn't find DB driver");
         } catch (SQLException e) {
             System.out.println("Database connection failed");
-            System.out.println("SQLException: " + e.getMessage());
-            System.out.println("SQLState: " + e.getSQLState());
-            System.out.println("VendorError: " + e.getErrorCode());
+            System.out.printf("SQLException: %s", e.getMessage());
+            System.out.printf("SQLState: %s", e.getSQLState());
+            System.out.printf("VendorError: %s", e.getErrorCode());
         }
     }
 
@@ -115,7 +115,7 @@ public class MySQLconnect {
             job = " LIKE" + "'%" + job + "%'";
         }
 
-        String sql = ("SELECT * FROM " + dbTable + " WHERE OCCUPATION" + job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person + " LIMIT 10000" + " ;");
+        String sql = ("SELECT * FROM " + dbTable + " WHERE OCCUPATION" + job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person + " LIMIT 200" + " ;");
 
         ResultSet rs = null;
         try {
