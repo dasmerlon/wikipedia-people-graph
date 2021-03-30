@@ -1,7 +1,6 @@
 package basecamp.project.server.controller;
 //PORT FORWARDING EINRICHTEN !! vorher!
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,57 +8,42 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import uhh_lt.datenbank.MySQLconnect;
-//import uhh_lt.datenverarbeitung.Verarbeitung; //vermutlich nur daten ummodeln
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 
 @RestController
 @RequestMapping("/users")
 public class FilterController {
 
-	@Value("${service.key}")
-	private String key;
+    @Value("${service.key}")
+    private String key;
 
-	@GetMapping	//umbennen in filters z.B. wenn funktionierend
+    @GetMapping    //umbennen in filters z.B. wenn funktionierend
 
-	//TODO defaultValue ggf. anpassen
+    //TODO defaultValue ggf. anpassen
+    public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person,
+                        @RequestParam(value = "birthdate", required = false, defaultValue = "") String birthdate,
+                        @RequestParam(value = "deathdate", required = false, defaultValue = "") String deathdate,
+                        @RequestParam(value = "job", required = false, defaultValue = "") String job) throws JSONException, SQLException {
 
-	public String users(@RequestParam(value = "person", required=false, defaultValue = "") String person,
-						@RequestParam(value = "birthdate", required=false, defaultValue = "") String birthdate,
-						@RequestParam(value = "deathdate", required=false, defaultValue = "") String deathdate,
-						@RequestParam(value = "job", required=false, defaultValue = "") String job) throws JSONException {
+        MySQLconnect con = new MySQLconnect();
 
-		MySQLconnect con = new MySQLconnect();
-		System.out.println("Connector erstellt");
-		//double[] watsonData = con.getWatson(date);
+        String json = con.getPersonData(person, birthdate, deathdate, job);
 
+        //Geburts und Todesdaten umformatieren
+        //String formattedjsonout = converter(jsonout);
 
-		String jsonout = con.getWatson(person, birthdate, deathdate, job);
+        return json;
+    }
 
-
-
-
-
-	//Geburts und Todesdaten umformatieren
-
-
-		//String formattedjsonout = converter(jsonout);
-
-		return jsonout;
-	}
-
-	@RequestMapping("nrusers")
-	String nrUsers() {
-		return "2";
-	}
+    @RequestMapping("nrusers")
+    String nrUsers() {
+        return "2";
+    }
 
 
-
-	// Example of jsonStr
+    // Example of jsonStr
 /* String jsonStr = "{\n"
         + "\"dt1\":\"12-12-2020\",\n"
         + "\"street\":\"test\",\n"
@@ -68,18 +52,18 @@ public class FilterController {
         + "\"dt2\":\"12-11-2020\"\n"
         + "}";
 */
-	public String converter(String jsonStr) throws JSONException {
+    public String converter(String jsonStr) throws JSONException {
 
-		// jsonStr is our original JSON with the date in the dash format (e.g. "12-12-2020")
+        // jsonStr is our original JSON with the date in the dash format (e.g. "12-12-2020")
 
-		JSONObject jo = new JSONObject();
+        JSONObject jo = new JSONObject();
 
-		// populate the array
-		jo.put("unsereAlteJson",jsonStr);
-		// Here we convert into our json object
-		//JSONObject jsono = new JSONObject(jsonStr);
+        // populate the array
+        jo.put("unsereAlteJson", jsonStr);
+        // Here we convert into our json object
+        //JSONObject jsono = new JSONObject(jsonStr);
 
-		//jsono.forEach((item) => item.BIRTH_DATE = item.optString("BIRTH_DATE").substring(3,dateStr.length()+1 ));
+        //jsono.forEach((item) => item.BIRTH_DATE = item.optString("BIRTH_DATE").substring(3,dateStr.length()+1 ));
 
 	/*	// Get the orginal date value
 		for (int i = 0; i< jo.getJSONArray("unsereAlteJson").length(); i++ ) {
@@ -105,22 +89,18 @@ public class FilterController {
 			}
 		}*/
 
-		return jo.toString();
-	}
+        return jo.toString();
+    }
 
-	private String dateConverter(String dateStr) {
-		if (dateStr.equals("NONE"))
-		{
-			return "";
-		}
-		else
-		{
-			String neuesDatum = dateStr.substring(3,dateStr.length()+1 );
-			return neuesDatum;
-		}
+    private String dateConverter(String dateStr) {
+        if (dateStr.equals("NONE")) {
+            return "";
+        } else {
+            String neuesDatum = dateStr.substring(3, dateStr.length() + 1);
+            return neuesDatum;
+        }
 
-	}
-
+    }
 
 
 }
