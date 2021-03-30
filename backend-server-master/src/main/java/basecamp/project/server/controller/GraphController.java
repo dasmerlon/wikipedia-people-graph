@@ -6,11 +6,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
+
+import java.sql.SQLException;
 //import uhh_lt.datenverarbeitung.Verarbeitung; //vermutlich nur daten ummodeln
 
 
@@ -18,22 +21,45 @@ import uhh_lt.datenbank.MySQLconnect;
 @RequestMapping("/graph_data")
 public class GraphController {
 
-    @GetMapping
+    @Value("${service.key}")
+    private String key;
+
+    @GetMapping    //umbennen in filters z.B. wenn funktionierend
+
+    //TODO defaultValue ggf. anpassen
+
     public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person) throws Exception {
 
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");
+        //double[] watsonData = con.getWatson(date);
+
 
         String jsonout = con.getRelationships(person);
 
         String jsonProcessed = converter(jsonout, true);
 
+        //Geburts und Todesdaten umformatieren
+
+
+        //String formattedjsonout = converter(jsonout);
+
+
+        //return jsonProcessed;
+
         return jsonProcessed;
     }
+
+    @RequestMapping("nrusers")
+    String nrUsers() {
+        return "2";
+    }
+
 
     public String converter(String jsonStr, Boolean layer0) throws Exception {
 
         System.out.println("CONVERTER INPUT " + jsonStr);
+
 
         JSONParser parser = new JSONParser();
 
@@ -61,11 +87,15 @@ public class GraphController {
             node1.put("id", neueId1);
 
             //System.out.println("node1 Objekt" + node1);
+
             nodesArray.put(node1);
+
 
             JSONObject contactObj = new JSONObject();
             contactObj.put("ContactName", neueId1);
+
             contactPersonArray.put(contactObj);
+
 
             //contactPersonArray.add(neueId1);
 
@@ -75,12 +105,17 @@ public class GraphController {
 
             nodesArray.put(node2);
 
+
             inputArray.getJSONObject(i);
         }
 
+
         //System.out.println("NODE ARRAY " + nodesArray);
 
+
         //build edges
+
+
         for (int i = 0; i < inputArray.length(); i++) {
             JSONObject o2 = inputArray.getJSONObject(i);
 
@@ -92,6 +127,8 @@ public class GraphController {
             edge.put("to", neueId2);
 
             edgesArray.put(edge);
+
+
         }
 
 

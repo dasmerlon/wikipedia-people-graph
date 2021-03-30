@@ -1,7 +1,5 @@
 package uhh_lt.datenbank;
 
-import uhh_lt.datenbank.ResultSetConverter;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -24,48 +22,48 @@ public class MySQLconnect {
     public MySQLconnect() throws Exception {
         // Read the credentials from the `resource/credentials.txt` file.
         // That way we don't have to hardcode stuff in our code base.
-		InputStream credentials = this.getClass().getClassLoader()
-                                .getResourceAsStream("credentials.txt");
-		if (credentials == null) {
+        InputStream credentials = this.getClass().getClassLoader()
+                .getResourceAsStream("credentials.txt");
+        if (credentials == null) {
             throw new Exception("Please edit and place a `credentials.txt` into the main/resources folder at build time");
         }
 
-		InputStreamReader streamReader = new InputStreamReader(credentials, StandardCharsets.UTF_8);
-		BufferedReader reader = new BufferedReader(streamReader);
+        InputStreamReader streamReader = new InputStreamReader(credentials, StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(streamReader);
 
-		String dbUser = null;
+        String dbUser = null;
         String dbPass = null;
         String dbHost = null;
         String dbPort = null;
         String dbName = null;
-		try {
-			String line = reader.readLine();
-			while (line != null) {
-				String[] fields = line.split("=");
-				if (fields[0].compareTo("mysql.user") == 0) {
-					dbUser = fields[1];
-				}
-				if (fields[0].compareTo("mysql.password") == 0) {
-					dbPass = fields[1];
-				}
-				if (fields[0].compareTo("mysql.host") == 0) {
-					dbHost = fields[1];
-				}
-				if (fields[0].compareTo("mysql.port") == 0) {
-					dbPort = fields[1];
-				}
-				if (fields[0].compareTo("mysql.database") == 0) {
-					dbName = fields[1];
-				}
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			System.out.println("Abfrage hat nicht funktioniert");
-		}
+        try {
+            String line = reader.readLine();
+            while (line != null) {
+                String[] fields = line.split("=");
+                if (fields[0].compareTo("mysql.user") == 0) {
+                    dbUser = fields[1];
+                }
+                if (fields[0].compareTo("mysql.password") == 0) {
+                    dbPass = fields[1];
+                }
+                if (fields[0].compareTo("mysql.host") == 0) {
+                    dbHost = fields[1];
+                }
+                if (fields[0].compareTo("mysql.port") == 0) {
+                    dbPort = fields[1];
+                }
+                if (fields[0].compareTo("mysql.database") == 0) {
+                    dbName = fields[1];
+                }
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Abfrage hat nicht funktioniert");
+        }
 
-		if (dbHost == null || dbName == null || dbUser == null || dbPass == null || dbPort == null) {
-		    throw new Exception("Your credentials file has to have a host, port, dbname, user and password");
+        if (dbHost == null || dbName == null || dbUser == null || dbPass == null || dbPort == null) {
+            throw new Exception("Your credentials file has to have a host, port, dbname, user and password");
         }
 
 
@@ -159,14 +157,13 @@ public class MySQLconnect {
         Statement st = null;
         st = con.createStatement();
 
-        String sql = "SELECT * FROM Relationships";
-
-        if (!person.equals("")) {
-            sql += String.format(" WHERE PERSON1 = %s;", person);
+        if (person.equals("")) {
+            person = "!=" + "'" + person + "'";
         } else {
-            sql += ";";
+            person = "=" + "'" + person + "'";
         }
 
+        String sql = ("SELECT * FROM Relationships WHERE PERSON1" + person + " ;");
 
         ResultSet rs = null;
         //TODO eventuell als JSONARRAY anpassen
@@ -187,5 +184,3 @@ public class MySQLconnect {
         return null;
     }
 }
-
-
