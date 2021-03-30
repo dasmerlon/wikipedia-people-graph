@@ -134,6 +134,39 @@ public class MySQLconnect {
 
         return null;
     }
+
+
+    public String getRelationships(String person) throws SQLException {
+        Statement st = null;
+        st = con.createStatement();
+
+        String sql = "SELECT * FROM Relationships";
+
+        if (!person.equals("")) {
+            sql += String.format(" WHERE PERSON1 = %s;", person);
+        } else {
+            sql += ";";
+        }
+
+
+        ResultSet rs = null;
+        //TODO eventuell als JSONARRAY anpassen
+        try {
+            rs = st.executeQuery(sql);
+            JSONArray jsonReceived = uhh_lt.datenbank.ResultSetConverter.convert(rs);
+            System.out.println(jsonReceived);
+            String j = jsonReceived.toString();
+
+            //JSONArray newJArray = new JSONArray(j);
+            //System.out.println(j);
+
+            return j;
+        } catch (SQLException | JSONException e) {
+            System.out.println("Anfrage konnte nicht ausgeführt werden");
+        }
+
+        return null;
+    }
 }
 
 

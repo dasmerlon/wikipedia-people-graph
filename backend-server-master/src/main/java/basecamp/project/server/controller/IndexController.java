@@ -15,12 +15,11 @@ public class IndexController {
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
     public String index(Model model) {
-
-        String message = "Our model message. Hello.";
-        model.addAttribute("message", message);
-
-        model.addAttribute("key", key);
-
         return "index";
+    }
+
+    @RequestMapping(value = {"/graph"}, method = RequestMethod.GET)
+    public String graph(Model model) {
+        return "graph";
     }
 }

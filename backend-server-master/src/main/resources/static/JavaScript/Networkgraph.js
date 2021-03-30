@@ -3,8 +3,6 @@
   var enddate = "";
   var profession = "";
 
-
-
 anychart.onDocumentReady(buildeMal());
 
  function buildeMal() {
@@ -15,7 +13,7 @@ anychart.onDocumentReady(buildeMal());
         container.innerHTML = "" ;
 
 
-    anychart.data.loadJsonFile('http://localhost:8080/users' + '?person=' + persons , function (data) {
+    anychart.data.loadJsonFile('/graph_data' + '?person=' + persons , function (data) {
 
         // create a chart from the loaded data
         var chart = anychart.graph(data);
@@ -95,5 +93,4 @@ function getSubmitFields() {
   enddate = document.getElementById("LivedUntilInput").value;
   profession = document.getElementById("ProfessionInput").value;
   buildeMal();
-
 }
