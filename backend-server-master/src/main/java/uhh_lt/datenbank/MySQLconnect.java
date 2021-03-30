@@ -1,8 +1,15 @@
 package uhh_lt.datenbank;
 
+import uhh_lt.datenbank.ResultSetConverter;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 
 /**
@@ -10,21 +17,27 @@ import java.sql.*;
  */
 public class MySQLconnect {
     private static Connection con = null;
-    private static String dbHost = "127.0.0.1";            // Hostname
-    private static String dbPort = "3306";                    // Port -- Standard: 3306
-    private static String dbName = "peoplegraph";    // Datenbankname
-    private static String dbUser = "root";    // Datenbankuser
-    private static String dbPass = "rofllol";                // Datenbankpasswort
-    private static String dbTable = "PersonData";    // Tabelle //PersonData PersonsStringDate
 
     /**
      * Stellt eine Verbindung zur Datenbank her.
      */
-    public MySQLconnect() {
-        // get credentials
-		/*InputStream is = MySQLconnect.class.getResourceAsStream("/credentials.txt");
-		InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+    public MySQLconnect() throws Exception {
+        // Read the credentials from the `resource/credentials.txt` file.
+        // That way we don't have to hardcode stuff in our code base.
+		InputStream credentials = this.getClass().getClassLoader()
+                                .getResourceAsStream("credentials.txt");
+		if (credentials == null) {
+            throw new Exception("Please edit and place a `credentials.txt` into the main/resources folder at build time");
+        }
+
+		InputStreamReader streamReader = new InputStreamReader(credentials, StandardCharsets.UTF_8);
 		BufferedReader reader = new BufferedReader(streamReader);
+
+		String dbUser = null;
+        String dbPass = null;
+        String dbHost = null;
+        String dbPort = null;
+        String dbName = null;
 		try {
 			String line = reader.readLine();
 			while (line != null) {
@@ -38,6 +51,9 @@ public class MySQLconnect {
 				if (fields[0].compareTo("mysql.host") == 0) {
 					dbHost = fields[1];
 				}
+				if (fields[0].compareTo("mysql.port") == 0) {
+					dbPort = fields[1];
+				}
 				if (fields[0].compareTo("mysql.database") == 0) {
 					dbName = fields[1];
 				}
@@ -46,7 +62,11 @@ public class MySQLconnect {
 			reader.close();
 		} catch (IOException e) {
 			System.out.println("Abfrage hat nicht funktioniert");
-		}*/
+		}
+
+		if (dbHost == null || dbName == null || dbUser == null || dbPass == null || dbPort == null) {
+		    throw new Exception("Your credentials file has to have a host, port, dbname, user and password");
+        }
 
 
         try {
@@ -54,7 +74,7 @@ public class MySQLconnect {
 
             String URI = String.format("jdbc:mysql://%s:%s/%s?useSSL=false", dbHost, dbPort, dbName);
 
-            System.out.printf("Try to connect to %s with user %s and pass %s%n", URI, dbUser, dbHost);
+            System.out.printf("Try to connect to %s with user %s and pass %s%n", URI, dbUser, dbPass);
 
             // Get Database connection
             con = DriverManager.getConnection(URI, dbUser, dbPass);
@@ -115,21 +135,20 @@ public class MySQLconnect {
             job = " LIKE" + "'%" + job + "%'";
         }
 
-        String sql = ("SELECT * FROM " + dbTable + " WHERE OCCUPATION" + job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person + " LIMIT 200" + " ;");
+        String sql = ("SELECT * FROM PersonData WHERE OCCUPATION" + job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person + " LIMIT 200" + " ;");
 
         ResultSet rs = null;
         try {
             rs = st.executeQuery(sql);
-            JSONArray jsonReceived = uhh_lt.datenbank.ResultSetConverter.convert(rs);
+            JSONArray jsonReceived = ResultSetConverter.convert(rs);
             System.out.println(jsonReceived);
             String j = jsonReceived.toString();
 
             //System.out.println(j);
             return j;
 
-
         } catch (SQLException | JSONException e) {
-            System.out.println("Anfrage konnte nicht ausgeführt werden");
+            System.out.printf("Anfrage konnte nicht ausgeführt werden: %s", e.getMessage());
         }
 
         return null;
@@ -153,7 +172,7 @@ public class MySQLconnect {
         //TODO eventuell als JSONARRAY anpassen
         try {
             rs = st.executeQuery(sql);
-            JSONArray jsonReceived = uhh_lt.datenbank.ResultSetConverter.convert(rs);
+            JSONArray jsonReceived = ResultSetConverter.convert(rs);
             System.out.println(jsonReceived);
             String j = jsonReceived.toString();
 

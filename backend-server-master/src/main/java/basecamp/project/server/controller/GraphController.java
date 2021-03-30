@@ -27,7 +27,7 @@ public class GraphController {
     private String key;
 
     @GetMapping
-    public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person) throws JSONException, ParseException, SQLException {
+    public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person) throws Exception {
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");
 
@@ -105,7 +105,7 @@ public class GraphController {
     /**
      * INPUT JSON DIREKT AUS DB
      */
-    public JSONObject getContactPersons(JSONObject jsonStr) throws JSONException, ParseException, SQLException {
+    public JSONObject getContactPersons(JSONObject jsonStr) throws Exception {
         System.out.println("CONVERTER INPUT " + jsonStr);
         JSONObject layer0Output = jsonStr;
 
@@ -138,7 +138,7 @@ public class GraphController {
     }
 
 
-    public JSONObject getSecondLayer(JSONArray nodesLayer1, JSONObject layer0Ausgabe) throws JSONException, ParseException, SQLException //INPUT CONTACT PERSON ARRAY
+    public JSONObject getSecondLayer(JSONArray nodesLayer1, JSONObject layer0Ausgabe) throws Exception //INPUT CONTACT PERSON ARRAY
     {
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");

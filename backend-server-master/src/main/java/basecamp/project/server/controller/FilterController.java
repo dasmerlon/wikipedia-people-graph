@@ -25,7 +25,7 @@ public class FilterController {
     public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person,
                         @RequestParam(value = "birthdate", required = false, defaultValue = "") String birthdate,
                         @RequestParam(value = "deathdate", required = false, defaultValue = "") String deathdate,
-                        @RequestParam(value = "job", required = false, defaultValue = "") String job) throws JSONException, SQLException {
+                        @RequestParam(value = "job", required = false, defaultValue = "") String job) throws Exception {
 
         MySQLconnect con = new MySQLconnect();
 
