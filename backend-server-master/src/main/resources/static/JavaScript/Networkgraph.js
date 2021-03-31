@@ -1,4 +1,4 @@
-  var persons = "Angela Merkel";
+  var persons = "Albert Einstein";
   var firstdate = "";
   var enddate = "";
   var profession = "";

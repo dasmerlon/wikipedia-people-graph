@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.80.0">
-    <title>Peoplegraph Timeline</title>
+    <title>About</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
 
@@ -32,9 +32,7 @@
 
     <!-- Custom styles for this template -->
     <link href="css/dashboard.css" rel="stylesheet">
-    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-bundle.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-graph.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-data-adapter.min.js"></script>
+
     <script src="JavaScript/bootstrap.bundle.min.js"></script>
 
     <style type="text/css">
@@ -69,14 +67,14 @@
                             Timeline
                         </a>
                     </li>
-                    <li class="nav-itemactive">
-                        <a class="nav-link active" href="/graph">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/graph">
                             <span data-feather="file"></span>
                             Graph view
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/about">
+                        <a class="nav-link active" href="/about">
                             <span data-feather="file"></span>
                             About
                         </a>
@@ -87,23 +85,17 @@
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Wikipedia People Graph</h1>
+                <h1 class="h2">About the project</h1>
+            </div>
+            <div class ="text"> Hier steht Text
+
+
+
             </div>
 
-            <!--<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>-->
-            <button id="SubmitInput" onclick="getSubmitFields()">Search!</button>
-            <label>Person: <input type="text" id="PersonInput" value="Albert Einstein" ></label>
-            <label>Profession: <input type="text" id="ProfessionInput" ></label>
-            <label>Lived from : <input type="date" id="LivedFromInput" ></label>
-            <label>Lived until : <input type="date" id="LivedUntilInput" ></label>
-            <br>
-            <br>
-            <!--hier ist die Box für den graph -->
-            <div id="container" style="height: 1000px;"></div>
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-            <script src="JavaScript/Networkgraph.js">
-            </script>
+
+
 
         </main>
     </div>
