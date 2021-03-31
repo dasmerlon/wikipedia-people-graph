@@ -2,6 +2,7 @@
   var firstdate = "";
   var enddate = "";
   var profession = "";
+  secondLayer = false;
 
 anychart.onDocumentReady(buildeMal());
 
@@ -13,7 +14,7 @@ anychart.onDocumentReady(buildeMal());
         container.innerHTML = "" ;
 
 
-    anychart.data.loadJsonFile('/graph_data' + '?person=' + persons , function (data) {
+    anychart.data.loadJsonFile('/graph_data' + '?person=' + persons + '&secLayer=' + secondLayer, function (data) {
 
         // create a chart from the loaded data
         var chart = anychart.graph(data);
@@ -98,5 +99,6 @@ function getSubmitFields() {
   firstdate = document.getElementById("LivedFromInput").value;
   enddate = document.getElementById("LivedUntilInput").value;
   profession = document.getElementById("ProfessionInput").value;
+  secondLayer = document.getElementById("layerCheckbox").checked;
   buildeMal();
 }

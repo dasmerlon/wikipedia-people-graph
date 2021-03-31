@@ -28,7 +28,9 @@ public class GraphController {
 
     //TODO defaultValue ggf. anpassen
 
-    public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person) throws Exception {
+    public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person,
+                        @RequestParam(value = "secLayer", required = false, defaultValue = "") Boolean secLayer) throws Exception {
+
 
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");
@@ -37,7 +39,8 @@ public class GraphController {
 
         String jsonout = con.getRelationships(person);
 
-        String jsonProcessed = converter(jsonout, true);
+        System.out.println("WERT SEC LAYER = " + secLayer);
+        String jsonProcessed = converter(jsonout, secLayer); //vorher true
 
         //Geburts und Todesdaten umformatieren
 
@@ -56,7 +59,7 @@ public class GraphController {
     }
 
 
-    public String converter(String jsonStr, Boolean layer0) throws Exception {
+    public String converter(String jsonStr, Boolean layer0) throws Exception { //wenn layer0 == true, dann hole nächste Ebene
 
         System.out.println("CONVERTER INPUT " + jsonStr);
 
