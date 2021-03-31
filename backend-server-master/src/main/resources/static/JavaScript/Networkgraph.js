@@ -18,8 +18,11 @@ anychart.onDocumentReady(buildeMal());
         // create a chart from the loaded data
         var chart = anychart.graph(data);
 
+
         // legt den Titel des Graohen fest
-        chart.title("People Graph");
+        chart.title("Use mouse wheel to zoom, click to see connections");
+
+
 
         // sorgt dafür das Einstellungen an den Knoten vorgenommen werden können
         var nodes = chart.nodes();
@@ -31,15 +34,13 @@ anychart.onDocumentReady(buildeMal());
 
         // set the fill of nodes
         nodes.normal().fill("#ffa000"); //ORANGE  // #ffa000
-        nodes.hovered().fill("white");
-        nodes.selected().fill("#ffa000");
-
-
+        nodes.hovered().fill("#333333", 3);
+        nodes.selected().fill("#f41300", 3);
 
         // Umrandung der Knoten
         nodes.normal().stroke(null);
         nodes.hovered().stroke("#333333", 3);
-        nodes.selected().stroke("#333333", 3);
+        nodes.selected().stroke("#f41300", 3);
 
         // Einschalten der labels (Bildunterschrift unter den Knoten)
         chart.nodes().labels().enabled(true);
@@ -54,8 +55,8 @@ anychart.onDocumentReady(buildeMal());
         // Woher der Text für die Bildunterschrift stammt
         chart.nodes().labels().format("{%id}");
         // Einstellungen für die Schrift
-        chart.nodes().labels().fontSize(2);
-        chart.nodes().labels().fontWeight(400);
+        chart.nodes().labels().fontSize(3);
+        chart.nodes().labels().fontWeight(600);
 
         // configure the visual settings of edges
         chart.edges().normal().stroke("#33ADFF", 0.1);
@@ -76,6 +77,11 @@ anychart.onDocumentReady(buildeMal());
          } else {
            return this.getData("from") + " -> " + this.getData("to");
          }});
+
+
+        //wähle Person, die eingegeben wurde aus und hebe sie damit hervor
+        chart.select([persons]);
+        chart.fit();
 
 
         // erstellt das Chart

@@ -148,6 +148,7 @@ public class GraphController {
 
             JSONObject out = getSecondLayer(contactPersonArray, obj);
 
+            System.out.println("FINAL OUT" + out);
             return out.toString();
         } else {
             return obj.toString();
