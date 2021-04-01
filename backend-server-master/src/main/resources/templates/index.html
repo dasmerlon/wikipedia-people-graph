@@ -20,10 +20,15 @@
         user-select: none;
       }
 
-      @media (min-width: 768px) {
+      @media (min-width: 500px) {
         .bd-placeholder-img-lg {
           font-size: 3.5rem;
         }
+      }
+
+      img {
+        width: 70%;
+        height: auto;
       }
     </style>
 
@@ -36,10 +41,9 @@
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Wikipedia People Graph</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/about">Wikipedia People Graph</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-targe
-            t="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 </header>
@@ -121,15 +125,13 @@
             <br>
             <br>
 
-            <!--hier ist die Box für den graph -->
-            <div id="container" style="height: 500px;"></div>
 
+            <div id="container" style="height: 640px; width: 75%; float:left; margin-bottom: 15px"></div>
 
-            <h2>Click for Infos about the person</h2>
-            <div id="TextDisplay" class="text" style="font-size:20px"> <!--class="paragraph"-->
-
+            <div id="TextDisplay" class="text" style="width: 23%; float:right; margin-bottom: 15px">
+                <h4>Click on a person for more information.</h4>
+                <img src='https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png' width="500" height="500">
             </div>
-            <img src='https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png' id="PictureDisplay" width="500" height="500">
         </main>
     </div>
 </div>

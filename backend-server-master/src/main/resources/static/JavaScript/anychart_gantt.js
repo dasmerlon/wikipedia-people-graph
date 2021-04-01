@@ -64,19 +64,18 @@
     container.innerHTML = "" ;
 
     // ruft users, die users Methode im FilterController auf?
-    //anychart.data.loadJsonFile('http://localhost:8080/users/' + '?person=' + persons + '?birthdate=' + firstdate + '?deathdate=' + enddate + '?job=' + profession,   function (data) {
-    anychart.data.loadJsonFile('http://localhost:8080/users' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession,   function (data) {
+    anychart.data.loadJsonFile('/users' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession,   function (data) {
 
 
     // set the input date/time format
-    anychart.format.inputDateTimeFormat("G-yyyy-MM-dd");
+    anychart.format.inputDateTimeFormat("G-y-MM-dd");
 
     //anychart.format.inputDateTimeFormat("yyyy");
 
 
     // set the output date/time format
     //anychart.format.outputDateTimeFormat("yyyy");
-    anychart.format.outputDateTimeFormat("G d MMMM yyyy");
+    anychart.format.outputDateTimeFormat("G d MMMM y");
 
 
     // create a data tree
@@ -87,6 +86,9 @@
 
     // create a chart
     chart = anychart.ganttProject(data);
+
+    // disable the first data grid column
+    chart.dataGrid().column(0).enabled(false);
 
     //CLICKIBUNTI
     chart.background("#64b5f6 0.2");
@@ -118,35 +120,114 @@
         chart.getTimeline().milestones().labels().enabled(false);
 
     // set the position of the splitter
-    chart.splitterPosition("17%");
+    chart.splitterPosition("20%");
+    chart.dataGrid().column(0).width('0%');
+    chart.dataGrid().column(1).width('100%');
 
 
 
     /* listen to the rowClick event
     and update the chart title */
     chart.listen("rowClick", function (e) {
-        if (e.item.get("SHORT_DESCRIPTION") == "NONE") {
-            var desc = "";
+
+        var months = [
+                      'January',
+                      'February',
+                      'March',
+                      'April',
+                      'May',
+                      'June',
+                      'July',
+                      'August',
+                      'September',
+                      'October',
+                      'November',
+                      'December'
+                    ]
+
+        var innerHTML = '<h4>' + e.item.get("TITLE") + "</h4>";
+
+        if (e.item.get("IMAGE") == "NONE") {
+            innerHTML += "<br />";
+            innerHTML += '<img src="https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png" width="500" height="500">';
         } else {
-            var desc = "<br />Short Description: " + e.item.get("SHORT_DESCRIPTION");
+            innerHTML += "<br />";
+            innerHTML += '<img src="' + e.item.get("IMAGE") + '"width="500" height="500">';
         }
-        if (e.item.get("OCCUPATION") == "NONE") {
-            var occ = "";
-        } else {
-            var occ = "<br />Profession: " + e.item.get("OCCUPATION");
+
+        if (e.item.get("LINK") != "NONE") {
+            innerHTML += "<br />";
+            innerHTML += '<a href="' + e.item.get("LINK") + '"><h6>Wiki page</h6></a>';
         }
-        var itemName = e.item.get("TITLE") + occ + desc;
-        var imgLink = e.item.get("IMAGE");
+
+        if (e.item.get("SHORT_DESCRIPTION") != "NONE") {
+            innerHTML += "<br />";
+            innerHTML += "<b>Short Description</b><br/>";
+            innerHTML += "<span>" + e.item.get("SHORT_DESCRIPTION") + "<span>";
+        }
+
+        if (e.item.get("BIRTH_DATE") != "NONE") {
+            innerHTML += "<br />";
+            innerHTML += "<b>Born</b><br/>";
+
+            var date = e.item.get("BIRTH_DATE").substring(3);
+            var era = e.item.get("BIRTH_DATE").split("-",1);
+            var splitDate = date.split("-");
+
+            if (splitDate.length == 3) {
+              	monthIndex = splitDate[1] - 1;
+                month = months[monthIndex];
+              	var newDate = splitDate[2] + " " + month + " " + splitDate[0] + " " + era;
+            } else {
+              	var newDate = splitDate[0] + " " + era;
+            }
+            innerHTML += "<span>" + newDate + "<span>";
+        }
+
+        if (e.item.get("BIRTH_PLACE") != "NONE") {
+            innerHTML += "<br />";
+            if (e.item.get("BIRTH_DATE") == "NONE") {
+                innerHTML += "<b>Born</b><br/>";
+            }
+            innerHTML += "<span>" + e.item.get("BIRTH_PLACE") + "<span>";
+        }
+
+        if (e.item.get("DEATH_DATE") != "NONE") {
+            innerHTML += "<br />";
+            innerHTML += "<b>Died</b><br/>";
+
+            var date = e.item.get("DEATH_DATE").substring(3);
+            var era = e.item.get("DEATH_DATE").split("-",1);
+            var splitDate = date.split("-");
+
+            if (splitDate.length == 3) {
+              	monthIndex = splitDate[1] - 1;
+                month = months[monthIndex];
+              	var newDate = splitDate[2] + " " + month + " " + splitDate[0] + " " + era;
+            } else {
+              	var newDate = splitDate[0] + " " + era;
+            }
+            innerHTML += "<span>" + newDate + "<span>";
+        }
+
+        if (e.item.get("DEATH_PLACE") != "NONE") {
+            innerHTML += "<br />";
+            if (e.item.get("DEATH_DATE") == "NONE") {
+                innerHTML += "<b>Died</b><br/>";
+            }
+            innerHTML += "<span>" + e.item.get("DEATH_PLACE") + "<span>";
+        }
+
+        if (e.item.get("OCCUPATION") != "NONE") {
+            innerHTML += "<br />";
+            innerHTML += "<b>Occupation</b><br/>";
+            innerHTML += "<span>" + e.item.get("OCCUPATION") + "<span>";
+        }
 
 
 
-        document.getElementById("TextDisplay").innerHTML = itemName;
 
-        document.getElementById("PictureDisplay").src= imgLink;
-
-
-
-
+        document.getElementById("TextDisplay").innerHTML = innerHTML;
     });
 
 
@@ -171,8 +252,8 @@
     chart.dataGrid().tooltip().useHtml(true);
     chart.dataGrid().tooltip().format(
      "<span style='font-weight:300;font-size:10pt'>" + "Born on " +
-                    "{%actualStart}{dateTimeFormat:d MMMM yyyy}<br>"  + "Died on " +
-                    "{%actualEnd}{dateTimeFormat:d MMMM yyyy}</span>"
+                    "{%actualStart}{dateTimeFormat:d MMMM y G}<br>"  + "Died on " +
+                    "{%actualEnd}{dateTimeFormat:d MMMM y G}</span>"
 
       );
 
@@ -180,8 +261,8 @@
        chart.getTimeline().tooltip().useHtml(true);
        chart.getTimeline().tooltip().format(
                "<span style='font-weight:300;font-size:10pt'>" + "Born on " +
-                    "{%actualStart}{dateTimeFormat:G d MMMM yyyy}<br>"  + "Died on " +
-                    "{%actualEnd}{dateTimeFormat:G d MMMM yyyy}</span>"
+                    "{%actualStart}{dateTimeFormat:d MMMM y G}<br>"  + "Died on " +
+                    "{%actualEnd}{dateTimeFormat:d MMMM y G}</span>"
 
        );
 
@@ -258,4 +339,3 @@ function getSubmitFields() {
   buildeMal();
 
 }
-
