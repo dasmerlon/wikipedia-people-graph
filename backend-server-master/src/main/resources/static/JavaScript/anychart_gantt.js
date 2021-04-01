@@ -120,17 +120,29 @@
     // set the position of the splitter
     chart.splitterPosition("17%");
 
+
+
     /* listen to the rowClick event
     and update the chart title */
     chart.listen("rowClick", function (e) {
-      var itemName = e.item.get("TITLE") + "<br />Profession: " + e.item.get("OCCUPATION") + " <br /> Short Description: " + e.item.get("SHORT_DESCRIPTION");
-      var imgLink = e.item.get("IMAGE");
+        if (e.item.get("SHORT_DESCRIPTION") == "NONE") {
+            var desc = "";
+        } else {
+            var desc = "<br />Short Description: " + e.item.get("SHORT_DESCRIPTION");
+        }
+        if (e.item.get("OCCUPATION") == "NONE") {
+            var occ = "";
+        } else {
+            var occ = "<br />Profession: " + e.item.get("OCCUPATION");
+        }
+        var itemName = e.item.get("TITLE") + occ + desc;
+        var imgLink = e.item.get("IMAGE");
 
 
 
-      document.getElementById("TextDisplay").innerHTML = itemName;
+        document.getElementById("TextDisplay").innerHTML = itemName;
 
-      document.getElementById("PictureDisplay").src= imgLink;
+        document.getElementById("PictureDisplay").src= imgLink;
 
 
 
