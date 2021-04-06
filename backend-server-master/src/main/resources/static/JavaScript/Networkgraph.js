@@ -21,7 +21,7 @@ anychart.onDocumentReady(buildeMal());
 
 
         // legt den Titel des Graohen fest
-        chart.title("Use mouse wheel to zoom, click to see connections");
+        chart.title("Use mouse wheel to zoom, click to highlight connections");
 
 
 

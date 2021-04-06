@@ -7,52 +7,22 @@
     <meta name="generator" content="Hugo 0.80.0">
     <title>Peoplegraph Timeline</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
-
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-    </style>
-
     <!-- Custom styles for this template -->
     <link href="css/dashboard.css" rel="stylesheet">
+    <script src="JavaScript/bootstrap.bundle.min.js"></script>
+
+    <!-- Anychart Library für Graph Visualisierung  -->
     <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-bundle.min.js"></script>
     <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-graph.min.js"></script>
     <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-data-adapter.min.js"></script>
-    <script src="JavaScript/bootstrap.bundle.min.js"></script>
-
-    <style type="text/css">
-        html, body, #container {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
-
 
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/about">Wikipedia People Graph</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
 </header>
 
 <div class="container-fluid">
@@ -87,7 +57,6 @@
                 <h1 class="h2">Wikipedia People Graph</h1>
             </div>
 
-            <!--<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>-->
             <button id="SubmitInput" onclick="getSubmitFields()">Search!</button>
             <label>Person: <input type="text" id="PersonInput" value="Albert Einstein" ></label>
             <label>Profession: <input type="text" id="ProfessionInput" ></label>
@@ -97,9 +66,8 @@
 
             <br>
             <br>
-            <!--hier ist die Box für den graph -->
+            <!--In diesem "container" wird der Graph erstellt -->
             <div id="container" style="height: 1000px;"></div>
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
             <script src="JavaScript/Networkgraph.js">
             </script>
@@ -107,10 +75,6 @@
         </main>
     </div>
 </div>
-
-
-
-
 
 </body>
 </html>

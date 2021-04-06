@@ -6,46 +6,29 @@
     <meta name="generator" content="Hugo 0.80.0">
     <title>Peoplegraph Timeline</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
-
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Custom styles for this template -->
+    <link href="css/dashboard.css" rel="stylesheet">
+    <script src="JavaScript/bootstrap.bundle.min.js"></script>
+
+    <!-- AnyChart Library für Timeline Visualisierung -->
+    <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-bundle.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-gantt.min.js"></script>
+
     <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 500px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-
       img {
         width: 70%;
         height: auto;
       }
     </style>
 
-    <!-- Custom styles for this template -->
-    <link href="css/dashboard.css" rel="stylesheet">
-    <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-bundle.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-gantt.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="JavaScript/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/about">Wikipedia People Graph</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+
 </header>
 
 <div class="container-fluid">
@@ -80,43 +63,13 @@
                 <h1 class="h2">Wikipedia People Timeline</h1>
             </div>
 
-            <!--<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>-->
+
 
             <button id="zoomInButton" onclick="zoomIn()">+</button>
             <button id="zoomOutButton" onclick="zoomOut()">-</button>
             <label>zoom factor: 2</label>
             <br>
             <br>
-            <!-- <button id="zoomToDatesButton" onclick="zoomToDates()">Zoom To Dates</button>
-             <label>start date:</label>
-             <label id="dateLabel1">03 February 2018</label>
-             <label>end date: </label>
-             <label id="dateLabel2">06 February 2018</label>
-             <br>
-             <button id="zoomToUnitsButton" onclick="zoomToUnits()">Zoom To Units</button>
-             <label for="unitSelect">unit: </label>
-             <select id="unitSelect">
-               <option value="millisecond">millisecond</option>
-               <option value="second">second</option>
-               <option value="minute">minute</option>
-               <option value="hour">hour</option>
-               <option value="day">day</option>
-               <option value="week" selected>week</option>
-               <option value="third-of-month">third-of-month</option>
-               <option value="month">month</option>
-               <option value="quarter">quarter</option>
-               <option value="semester">semester</option>
-               <option value="year">year</option></select>
-             <label>count: <input id="countInput" value="2"></label>
-             <label for="anchorSelect">anchor: </label>
-             <select id="anchorSelect">
-               <option value="first-date" selected>first-date</option>
-               <option value="first-visible-date">first-visible-date</option>
-               <option value="last-date">last-date</option>
-               <option value="last-visible-date">last-visible-date</option>
-             </select>
-             <br>-->
-
             <button id="SubmitInput" onclick="getSubmitFields()">Search!</button>
             <label>Person: <input type="text" id="PersonInput"></label>
             <label>Profession: <input type="text" id="ProfessionInput" value="Politics"></label>
@@ -126,20 +79,20 @@
             <br>
 
 
+            <!-- In diesem "Container" wird die Timeline erstellt -->
             <div id="container" style="height: 640px; width: 75%; float:left; margin-bottom: 15px"></div>
 
+            <!-- In diesem "TextDisplay" werden Infos zur Person angezeigt-->
             <div id="TextDisplay" class="text" style="width: 23%; float:right; margin-bottom: 15px">
                 <h4>Click on a person for more information.</h4>
                 <img src='https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png' width="500" height="500">
             </div>
+            <script src="JavaScript/anychart_gantt.js"></script>
         </main>
     </div>
 </div>
 
-<!--
-<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script><script src="JavaScript/dashboard.js"></script>
--->
-<script src="JavaScript/anychart_gantt.js"></script>
+
 
 </body>
 </html>
