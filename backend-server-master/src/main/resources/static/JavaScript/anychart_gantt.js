@@ -54,7 +54,7 @@
                })();*/
 
  /*   var name = "Eugen";
-    anychart.data.loadJsonFile('http://localhost:8080/users/?name=' + name,   function (data) {*/
+    anychart.data.loadJsonFile('/users/?name=' + name,   function (data) {*/
 
 
 

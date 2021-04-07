@@ -7,7 +7,7 @@
 anychart.onDocumentReady(buildeMal());
 
  function buildeMal() {
-    //anychart.data.loadJsonFile('http://localhost:8080/JSONs/testdaten.json', function (data) {
+    //anychart.data.loadJsonFile(/JSONs/testdaten.json', function (data) {
 
 
         var container = document.getElementById("container");
