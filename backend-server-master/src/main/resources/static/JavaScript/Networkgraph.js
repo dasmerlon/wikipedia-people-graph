@@ -1,7 +1,4 @@
   var persons = "Albert Einstein";
-  var firstdate = "";
-  var enddate = "";
-  var profession = "";
   secondLayer = false;
 
 
@@ -31,19 +28,19 @@ anychart.onDocumentReady(buildeMal());
         var nodes = chart.nodes();
 
         // Größe der Knoten
-        nodes.normal().height(3);
-        nodes.hovered().height(4);
-        nodes.selected().height(4);
+        nodes.normal().height(6);
+        nodes.hovered().height(7);
+        nodes.selected().height(7);
 
         // set the fill of nodes
-        nodes.normal().fill("#ffa000"); //ORANGE  // #ffa000
+        nodes.normal().fill("#455a64");  // #ffa000 = Orange
         nodes.hovered().fill("#333333", 3);
-        nodes.selected().fill("#f41300", 3);
+        nodes.selected().fill("#dd2c00", 3);
 
         // Umrandung der Knoten
         nodes.normal().stroke(null);
         nodes.hovered().stroke("#333333", 3);
-        nodes.selected().stroke("#f41300", 3);
+        nodes.selected().stroke("#dd2c00", 3);
 
         // Einschalten der labels (Bildunterschrift unter den Knoten)
         chart.nodes().labels().enabled(true);
@@ -58,13 +55,13 @@ anychart.onDocumentReady(buildeMal());
         // Woher der Text für die Bildunterschrift stammt
         chart.nodes().labels().format("{%id}");
         // Einstellungen für die Schrift
-        chart.nodes().labels().fontSize(3);
+        chart.nodes().labels().fontSize(7);
         chart.nodes().labels().fontWeight(600);
 
         // configure the visual settings of edges
-        chart.edges().normal().stroke("#33ADFF", 0.1);
-        chart.edges().hovered().stroke("#33ADFF", 2);
-        chart.edges().selected().stroke("#33ADFF", 2);
+        chart.edges().normal().stroke("#64B5F6", 0.5);
+        chart.edges().hovered().stroke("#64B5F6", 2);
+        chart.edges().selected().stroke("#64B5F6", 1.5);
 /*
         chart.edges().normal().fill("#ffa000", 2, "10 5", "round");
         chart.edges().hovered().fill("#ffa000", 4, "10 5", "round");
@@ -78,7 +75,7 @@ anychart.onDocumentReady(buildeMal());
                   this.id +
                   "</span><br><br>Connections: " + this.siblings.length ;
          } else {
-           return this.getData("from") + " -> " + this.getData("to");
+           return this.getData("to") + " -> " + this.getData("from");
          }});
 
 
@@ -98,9 +95,6 @@ anychart.onDocumentReady(buildeMal());
 
 function getSubmitFields() {
   persons = document.getElementById("PersonInput").value;
-  firstdate = document.getElementById("LivedFromInput").value;
-  enddate = document.getElementById("LivedUntilInput").value;
-  profession = document.getElementById("ProfessionInput").value;
   secondLayer = document.getElementById("layerCheckbox").checked;
   buildeMal();
 }
