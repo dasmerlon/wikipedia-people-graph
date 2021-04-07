@@ -25,11 +25,12 @@ public class FilterController {
     public String users(@RequestParam(value = "person", required = false, defaultValue = "") String person,
                         @RequestParam(value = "birthdate", required = false, defaultValue = "") String birthdate,
                         @RequestParam(value = "deathdate", required = false, defaultValue = "") String deathdate,
-                        @RequestParam(value = "job", required = false, defaultValue = "") String job) throws Exception {
+                        @RequestParam(value = "job", required = false, defaultValue = "") String job,
+                        @RequestParam(value = "startsWith", required = false, defaultValue = "") String startsWith) throws Exception {
 
         MySQLconnect con = new MySQLconnect();
 
-        String json = con.getPersonData(person, birthdate, deathdate, job);
+        String json = con.getPersonData(person, birthdate, deathdate, job, startsWith);
 
         //Geburts und Todesdaten umformatieren
         //String formattedjsonout = converter(jsonout);

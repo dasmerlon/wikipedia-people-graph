@@ -102,7 +102,7 @@ public class MySQLconnect {
      * Liest Watson Daten aus der Datenbank aus und errechnet Durchschnittswerte für den Sentiment Score und die Emotions.
      * * @return ein double Array mit den Watson Werten in der Reihenfolge Sentiment, Sadness, Joy, Fear, Disgust, Anger
      */
-    public String getPersonData(String person, String birthdate, String deathdate, String job) throws SQLException {
+    public String getPersonData(String person, String birthdate, String deathdate, String job, String startsWith) throws SQLException {
 
         Statement st = null;
         st = con.createStatement();
@@ -133,7 +133,13 @@ public class MySQLconnect {
             job = " LIKE" + "'%" + job + "%'";
         }
 
-        String sql = ("SELECT * FROM PersonData WHERE OCCUPATION" + job + " AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND TITLE" + person + " LIMIT 200" + " ;");
+        if (startsWith.equals("")) {
+            startsWith = "!=" + "'" + startsWith + "'";
+        } else {
+            startsWith = " LIKE" + "'" + startsWith + "%'";
+        }
+
+        String sql = ("SELECT * FROM PersonData WHERE (OCCUPATION" + job + " OR OFFICE" + job + ") AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND (TITLE" + person + " AND TITLE" + startsWith + ") LIMIT 200" + " ;");
 
         ResultSet rs = null;
         try {

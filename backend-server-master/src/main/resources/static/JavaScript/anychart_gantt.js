@@ -2,6 +2,7 @@
   var firstdate = "";
   var enddate = "";
   var profession = "Politics";
+  var startsWith = "A";
 
   var chart;
   //anychart.onDocumentReady(function buildeMal() {
@@ -64,7 +65,7 @@
     container.innerHTML = "" ;
 
     // ruft users, die users Methode im FilterController auf?
-    anychart.data.loadJsonFile('/users' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession,   function (data) {
+    anychart.data.loadJsonFile('/users' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession + '&startsWith=' + startsWith,   function (data) {
 
 
     // set the input date/time format
@@ -330,12 +331,22 @@ function zoomToUnits() {
   chart.zoomTo(unit, count, anchor);
 }
 
+function charClick() {
+    startsWith = event.srcElement.id;
+    persons = document.getElementById("PersonInput").value;
+    firstdate = document.getElementById("LivedFromInput").value;
+    enddate = document.getElementById("LivedUntilInput").value;
+    profession = document.getElementById("ProfessionInput").value;
+    buildeMal();
+}
+
+
 // zoom the timeline to the given units
 function getSubmitFields() {
   persons = document.getElementById("PersonInput").value;
   firstdate = document.getElementById("LivedFromInput").value;
   enddate = document.getElementById("LivedUntilInput").value;
   profession = document.getElementById("ProfessionInput").value;
+  startsWith = '';
   buildeMal();
-
 }

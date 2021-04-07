@@ -65,10 +65,6 @@ input[type="text"]:focus, input[type="date"]:focus {
   cursor: pointer;
   font-size: 13px;
   color: #7a7a7a;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 
 /* Hide the browser's default checkbox */
