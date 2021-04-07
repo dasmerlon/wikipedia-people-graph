@@ -2,8 +2,27 @@ body {
   font-size: .875rem;
 }
 
+.input, label {
+    display:block;
+}
+
 .text {
     font-size: 14px;
+}
+
+input[type="text"], input[type="date"] {
+  padding: 7px 16px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  border: 3px solid #ccc;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+  border-radius: 8px;
+}
+
+input[type="text"]:focus, input[type="date"]:focus {
+  border: 3px solid #a3d4fc;
 }
 
 .feather {
@@ -11,6 +30,32 @@ body {
   height: 16px;
   vertical-align: text-bottom;
 }
+
+.img {
+        width: 70%;
+        height: auto;
+}
+
+.button {
+  background-color: #B3DBFB;
+  color: black;
+  padding: 7px 16px;
+  margin-bottom: 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 2px solid #B3DBFB;
+}
+
+.button:hover {
+  background-color: #64B5F6;
+  border: 2px solid #64B5F6;
+}
+
 
 /*
  * Sidebar

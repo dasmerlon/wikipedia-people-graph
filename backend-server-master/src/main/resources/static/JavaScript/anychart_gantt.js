@@ -111,10 +111,10 @@
     chart.getTimeline().tasks().height(35);
 
     var milestones = chart.getTimeline().milestones();
-        milestones.normal().fill("#ffff05 1.0");
+        milestones.normal().fill("#455a64 1.0");  // #ffff05 = gelb
         milestones.selected().fill("#dd2c00");
-        milestones.normal().stroke("#000000");
-        milestones.selected().stroke("#000000");
+        milestones.normal().stroke("#455a64");
+        milestones.selected().stroke("#dd2c00");
 
      // disable labels of milestones
         chart.getTimeline().milestones().labels().enabled(false);
@@ -149,10 +149,10 @@
 
         if (e.item.get("IMAGE") == "NONE") {
             innerHTML += "<br />";
-            innerHTML += '<img src="https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png" width="500" height="500">';
+            innerHTML += '<img class="img" src="https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png" width="500" height="500">';
         } else {
             innerHTML += "<br />";
-            innerHTML += '<img src="' + e.item.get("IMAGE") + '"width="500" height="500">';
+            innerHTML += '<img class="img" src="' + e.item.get("IMAGE") + '"width="500" height="500">';
         }
 
         if (e.item.get("LINK") != "NONE") {

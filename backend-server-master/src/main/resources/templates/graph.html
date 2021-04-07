@@ -61,12 +61,37 @@
                 <h1 class="h2">Wikipedia People Graph</h1>
             </div>
 
-            <button id="SubmitInput" onclick="getSubmitFields()">Search!</button>
-            <label>Person: <input type="text" id="PersonInput" value="Albert Einstein" ></label>
-            <label>Profession: <input type="text" id="ProfessionInput" ></label>
-            <label>Second Layer (expect longer loading times for very famous persons) : <input type="checkbox" id="layerCheckbox" onclick="getSubmitFields()"></label>
-            <label>Lived from : <input type="date" id="LivedFromInput" ></label>
-            <label>Lived until : <input type="date" id="LivedUntilInput" ></label>
+            <div style="float:left;margin-right:20px;">
+                <label><b>Person</b></label>
+                <input type="text" id="PersonInput" value="Albert Einstein">
+            </div>
+
+            <div style="float:left;margin-right:20px;">
+                <label><b>Occupation</b></label>
+                <input type="text" id="ProfessionInput">
+            </div>
+
+            <div style="float:left;margin-right:20px;">
+                <label><b>Lived from</b></label>
+                <input type="date" id="LivedFromInput">
+            </div>
+
+            <div style="float:left;margin-right:20px;">
+                <label><b>Lived until</b></label>
+                <input type="date" id="LivedUntilInput">
+            </div>
+
+            <div style="float:left;">
+                <label><br></label>
+                <button class="button" id="SubmitInput" onclick="getSubmitFields()">Search!</button>
+            </div>
+
+            <div style="float:left;margin-right:50px;">
+                <label><b>Second Layer</b>
+                <input type="checkbox" id="layerCheckbox" onclick="getSubmitFields()"></label>
+                <p style="color: #989898;"><i>(expect longer loading times for famous people)</i></p>
+            </div>
+
 
             <br>
             <br>
