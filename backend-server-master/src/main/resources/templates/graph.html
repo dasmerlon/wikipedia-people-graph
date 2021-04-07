@@ -81,15 +81,19 @@
                 <input type="date" id="LivedUntilInput">
             </div>
 
-            <div style="float:left;">
+            <div style="float:left;margin-right:20px;">
                 <label><br></label>
                 <button class="button" id="SubmitInput" onclick="getSubmitFields()">Search!</button>
             </div>
 
-            <div style="float:left;margin-right:50px;">
-                <label><b>Second Layer</b>
-                <input type="checkbox" id="layerCheckbox" onclick="getSubmitFields()"></label>
-                <p style="color: #989898;"><i>(expect longer loading times for famous people)</i></p>
+            <div style="float:left;">
+                <label><b>Second Layer</b></label>
+                <label class="checkbox-container">
+                    Expect longer loading times <br>
+                    for famous people!
+                    <input title="Expect longer loading times for famous people!" type="checkbox" id="layerCheckbox" onclick="getSubmitFields()">
+                    <span class="checkmark"></span>
+                </label>
             </div>
 
 
