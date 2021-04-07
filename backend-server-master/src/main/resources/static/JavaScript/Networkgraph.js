@@ -4,6 +4,8 @@
   var profession = "";
   secondLayer = false;
 
+
+
 anychart.onDocumentReady(buildeMal());
 
  function buildeMal() {

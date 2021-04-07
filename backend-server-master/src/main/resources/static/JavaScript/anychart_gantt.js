@@ -2,7 +2,7 @@
   var firstdate = "";
   var enddate = "";
   var profession = "Politics";
-  var startsWith = "A";
+  var startsWith = "";
 
   var chart;
   //anychart.onDocumentReady(function buildeMal() {
