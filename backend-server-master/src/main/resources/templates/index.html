@@ -40,12 +40,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/graph">
-                            <span data-feather="file"></span>
-                            Graph view
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="/about">
                             <span data-feather="file"></span>
                             About
@@ -69,7 +63,7 @@
 
                 <div style="float:left;margin-right:20px;">
                     <label><b>Occupation</b></label>
-                    <input type="text" id="ProfessionInput" value="Politics">
+                    <input type="text" id="ProfessionInput" value="">
                 </div>
 
                 <div style="float:left;margin-right:20px;">
@@ -147,13 +141,13 @@
                 <label><b>Show Second Layer</b></label>
                 <label class="checkbox-container">
                     Expect longer loading </br> times for famous people!
-                    <input title="Expect longer loading times for famous people!" type="checkbox" id="layerCheckbox" onclick="getSubmitFields()">
+                    <input title="Expect longer loading times for famous people!" type="checkbox" id="layerCheckbox">
                     <span class="checkmark"></span>
                 </label>
             </div>
 
             <!--In diesem "container" wird der Graph erstellt -->
-            <div id="graphContainer" style="height: 680px;"></div>
+            <div id="graphContainer" style="height: 800px; width: 100%;float: left;"></div>
             <script src="JavaScript/main.js"></script>
         </main>
     </div>

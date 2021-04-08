@@ -353,3 +353,9 @@ function buildGraph() {
         graphChart.invalidate();
     }
 }
+
+// Listen on the layer checkbox and refresh the graph on change
+document.getElementById("layerCheckbox").addEventListener("change", function (e) {
+    secondLayer = this.checked;
+    buildGraph();
+});
