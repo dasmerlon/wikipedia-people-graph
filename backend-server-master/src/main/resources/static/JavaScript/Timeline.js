@@ -16,7 +16,7 @@
     var container = document.getElementById("container");
     container.innerHTML = "" ;
 
-    anychart.data.loadJsonFile('/users' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession + '&startsWith=' + startsWith,   function (data) {
+    anychart.data.loadJsonFile('/filter' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession + '&startsWith=' + startsWith,   function (data) {
 
 
     // set the input date/time format
