@@ -20,7 +20,7 @@
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/about">Wikipedia People Graph</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/">Wikipedia People Graph</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
             data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
             aria-label="Toggle navigation">
@@ -34,9 +34,15 @@
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">
+                        <a class="nav-link active" aria-current="page" href="#timeline">
                             <span data-feather="home"></span>
                             Timeline
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#graphContainer">
+                            <span data-feather="file"></span>
+                            Graph
                         </a>
                     </li>
                     <li class="nav-item">
@@ -50,8 +56,9 @@
         </nav>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Wikipedia People Timeline</h1>
+            <div id="timeline"
+                 class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Wikipedia People Timeline and Graph</h1>
             </div>
 
             <div style=" width: 75%">
@@ -130,14 +137,14 @@
 
                 <!-- In diesem "TextDisplay" werden Infos zur Person angezeigt-->
                 <div id="TextDisplay" class="text" style="height: 630px; width: 23%; float:right; margin-bottom: 15px">
-                    <h4>Click on a person for more information.</h4>
+                    <h4>Click on a person to view their relationships and more information.</h4>
                     <img class="img"
                          src='https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png'
                          width="500" height="500">
                 </div>
             </div>
 
-            <div style="float:left;">
+            <div style="float:left; width: 50%;">
                 <label><b>Show Second Layer</b></label>
                 <label class="checkbox-container">
                     Expect longer loading </br> times for famous people!
@@ -147,7 +154,11 @@
             </div>
 
             <!--In diesem "container" wird der Graph erstellt -->
-            <div id="graphContainer" style="height: 800px; width: 100%;float: left;"></div>
+            <div id="graphContainer" style="height: 800px; width: 75%; float: left;">
+                <div style="display:flex; justify-content: center;">
+                    <h3>Please select a person in the timeline to view a graph.</h3>
+                </div>
+            </div>
             <script src="JavaScript/main.js"></script>
         </main>
     </div>

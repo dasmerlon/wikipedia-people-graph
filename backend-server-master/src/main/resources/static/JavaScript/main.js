@@ -1,10 +1,10 @@
 //Variablen, die den Inhalt der Timeline definieren und durch den User verändert werden können
 var relatedPersonsOnly = false;
 var secondLayer = false;
-var persons = "";
+var persons = "Einstein";
 var firstdate = "";
 var enddate = "";
-var profession = "Politics";
+var profession = "";
 var startsWith = "";
 
 var timelineChart;
