@@ -13,22 +13,22 @@ import uhh_lt.datenbank.MySQLconnect;
 @RequestMapping("/persons")
 public class PersonController {
 
-     /**
+    /**
      * Erstellt ein Objekt der Klasse MySQLconnect und nutzt dieses um die mit den Parametern gefilterten Personen-Daten von einer SQL-Datenbank abzurufen.
      *
-     * @param  person  Eingegebener Name für Personen
-     * @param  birthdate Eingegebenes Geburtsdatum für Personen
-     * @param  deathdate Eingegebenes Todesdatum für Personen
-     * @param  job Eingegebene Berufsbezeichnung für Personen
-     * @param  startsWith Ausgewählter Anfangsbuchstabe für Namen einer Person
+     * @param person     Eingegebener Name für Personen
+     * @param birthdate  Eingegebenes Geburtsdatum für Personen
+     * @param deathdate  Eingegebenes Todesdatum für Personen
+     * @param job        Eingegebene Berufsbezeichnung für Personen
+     * @param startsWith Ausgewählter Anfangsbuchstabe für Namen einer Person
      * @return finaler JSON-String mit Timeline-Daten zu gefilterten Personen. Dient als Eingabe für die anychart-gantt.min.js Library im Timeline.js.
      */
     @GetMapping
     public String filter(@RequestParam(value = "person", required = false, defaultValue = "") String person,
-                        @RequestParam(value = "birthdate", required = false, defaultValue = "") String birthdate,
-                        @RequestParam(value = "deathdate", required = false, defaultValue = "") String deathdate,
-                        @RequestParam(value = "job", required = false, defaultValue = "") String job,
-                        @RequestParam(value = "startsWith", required = false, defaultValue = "") String startsWith) throws Exception {
+                         @RequestParam(value = "birthdate", required = false, defaultValue = "") String birthdate,
+                         @RequestParam(value = "deathdate", required = false, defaultValue = "") String deathdate,
+                         @RequestParam(value = "job", required = false, defaultValue = "") String job,
+                         @RequestParam(value = "startsWith", required = false, defaultValue = "") String startsWith) throws Exception {
 
         MySQLconnect con = new MySQLconnect();
 
