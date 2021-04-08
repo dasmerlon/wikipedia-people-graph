@@ -8,6 +8,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+
+/**
+ * Diese Klasse kann mit der convert Methode den Datentyp ResultSet in JSONArray umwandeln
+ */
 public class ResultSetConverter {
 	public static JSONArray convert(ResultSet rs )
 			throws SQLException, JSONException
