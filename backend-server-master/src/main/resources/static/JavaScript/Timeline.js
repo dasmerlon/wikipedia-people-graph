@@ -1,24 +1,26 @@
 //Variablen, die den Inhalt der Timeline definieren und durch den User verändert werden können
 var relatedPersonsOnly = false;
+var secondLayer = false;
 var persons = "";
 var firstdate = "";
 var enddate = "";
 var profession = "Politics";
 var startsWith = "";
 
-var chart;
+var timelineChart;
+var graphChart;
 
-//beim initialen Laden Seite wird die Timeline mit default-Werten gebaut
+// Beim initialen Laden Seite wird die Timeline mit default-Werten gebaut
 anychart.onDocumentReady(buildTimeline());
 
-// Erstellt die Timeline in der "container"-div
+// Erstellt die Timeline in der "timelineContainer"-div
 function buildTimeline() {
-
-    var container = document.getElementById("container");
+    var container = document.getElementById("timelineContainer");
     container.innerHTML = "";
 
-    // Wir operieren in zwei modi.
-    // Wenn nur related
+    // Wir operieren in zwei Modi.
+    // Wenn `realtedPersonsOnly === true`, dann werden die Personen angezeigt, die zur momentan ausgewählten Person related sind.
+    // Andernfalls werden alle Personen angezeigt, die auf die momentanen Form-Filterkriteren zutreffen.
     let url;
     if (relatedPersonsOnly) {
         url = '/relatedPersons' + '?person=' + persons + '&startsWith=' + startsWith;
@@ -41,45 +43,45 @@ function buildTimeline() {
         var mapping = treeData.mapAs({name: "TITLE", actualStart: "BIRTH_DATE", actualEnd: "DEATH_DATE"});
 
         // create a chart
-        chart = anychart.ganttProject(data);
+        timelineChart = anychart.ganttProject(data);
         // disable the first data grid column
-        chart.dataGrid().column(0).enabled(false);
+        timelineChart.dataGrid().column(0).enabled(false);
 
         // configure chart design
-        chart.background("#64b5f6 0.2");
-        chart.rowHoverFill("#ffd54f 0.3");
-        chart.rowSelectedFill("#ffd54f 0.3");
-        chart.rowStroke("0.5 #64b5f6");
-        chart.columnStroke("0.5 #64b5f6");
+        timelineChart.background("#64b5f6 0.2");
+        timelineChart.rowHoverFill("#ffd54f 0.3");
+        timelineChart.rowSelectedFill("#ffd54f 0.3");
+        timelineChart.rowStroke("0.5 #64b5f6");
+        timelineChart.columnStroke("0.5 #64b5f6");
 
         // configure task design
-        var tasks = chart.getTimeline().tasks();
+        var tasks = timelineChart.getTimeline().tasks();
         tasks.normal().fill("#455a64 1.0");
         tasks.selected().fill("#dd2c00");
         tasks.normal().stroke("#455a64");
         tasks.selected().stroke("#dd2c00");
 
         // disable labels of tasks
-        chart.getTimeline().tasks().labels().enabled(false);
+        timelineChart.getTimeline().tasks().labels().enabled(false);
         // configure the height of tasks
-        chart.getTimeline().tasks().height(35);
+        timelineChart.getTimeline().tasks().height(35);
 
         // configure milestone design
-        var milestones = chart.getTimeline().milestones();
+        var milestones = timelineChart.getTimeline().milestones();
         milestones.normal().fill("#455a64 1.0");  // #ffff05 = gelb
         milestones.selected().fill("#dd2c00");
         milestones.normal().stroke("#455a64");
         milestones.selected().stroke("#dd2c00");
 
         // disable labels of milestones
-        chart.getTimeline().milestones().labels().enabled(false);
+        timelineChart.getTimeline().milestones().labels().enabled(false);
         // set the position of the splitter
-        chart.splitterPosition("20%");
-        chart.dataGrid().column(0).width('0%');
-        chart.dataGrid().column(1).width('100%');
+        timelineChart.splitterPosition("20%");
+        timelineChart.dataGrid().column(0).width('0%');
+        timelineChart.dataGrid().column(1).width('100%');
 
         // configure the visual settings of the data grid
-        var dataGrid = chart.dataGrid();
+        var dataGrid = timelineChart.dataGrid();
         dataGrid.rowEvenFill("gray 0.3");
         dataGrid.rowOddFill("gray 0.1");
         dataGrid.rowHoverFill("#ffd54f 0.3");
@@ -88,35 +90,35 @@ function buildTimeline() {
         dataGrid.headerFill("#64b5f6 0.2");
 
         // set the row height
-        chart.defaultRowHeight(35);
+        timelineChart.defaultRowHeight(35);
         // set the header height
-        chart.headerHeight(40);
+        timelineChart.headerHeight(40);
 
         // configure tooltips of the data grid
-        chart.dataGrid().tooltip().useHtml(true);
-        chart.dataGrid().tooltip().format(
+        timelineChart.dataGrid().tooltip().useHtml(true);
+        timelineChart.dataGrid().tooltip().format(
             "<span style='font-weight:300;font-size:10pt'>" + "Born on " +
             "{%actualStart}{dateTimeFormat:d MMMM y G}<br>" + "Died on " +
             "{%actualEnd}{dateTimeFormat:d MMMM y G}</span>"
         );
 
         // configure tooltips of the timeline
-        chart.getTimeline().tooltip().useHtml(true);
-        chart.getTimeline().tooltip().format(
+        timelineChart.getTimeline().tooltip().useHtml(true);
+        timelineChart.getTimeline().tooltip().format(
             "<span style='font-weight:300;font-size:10pt'>" + "Born on " +
             "{%actualStart}{dateTimeFormat:d MMMM y G}<br>" + "Died on " +
             "{%actualEnd}{dateTimeFormat:d MMMM y G}</span>"
         );
 
         // set the data
-        chart.data(mapping);
+        timelineChart.data(mapping);
         // set the minimum and maximum values of the scale
-        chart.getTimeline().scale().maximum("2022-01-01");
+        timelineChart.getTimeline().scale().maximum("2022-01-01");
         // set the container id
-        chart.container("container");
+        timelineChart.container("timelineContainer");
 
         // set zoom levels of the scale
-        chart.getTimeline().scale().zoomLevels([
+        timelineChart.getTimeline().scale().zoomLevels([
             [
                 {unit: "year", count: 50},
                 {unit: "year", count: 10},
@@ -126,13 +128,13 @@ function buildTimeline() {
         ]);
 
         // initiate drawing the chart
-        chart.draw();
+        timelineChart.draw();
 
         // fit elements to the width of the timeline
-        chart.fitAll();
+        timelineChart.fitAll();
 
         /* listen to the rowClick event and update the Info Box (TextDisplay) */
-        chart.listen("rowClick", function (e) {
+        timelineChart.listen("rowClick", function (e) {
             updatePersonalInformationBox(e);
 
             // Reload the chart with all persons that are related to the selected person
@@ -140,18 +142,20 @@ function buildTimeline() {
             startsWith = '';
             persons = e.item.get("TITLE");
             buildTimeline();
+            secondLayer = document.getElementById("layerCheckbox").checked;
+            buildGraph();
         });
     });
 };
 
 // zoom the timeline in
 function zoomIn() {
-    chart.zoomIn(2);
+    timelineChart.zoomIn(2);
 }
 
 // zoom the timeline out
 function zoomOut() {
-    chart.zoomOut(2);
+    timelineChart.zoomOut(2);
 }
 
 // Aktualisiert die Variablen mit den eingegebenen Werten aus den Filter-Feldern und dem ausgewählten Buchstaben. Baut Timeline neu (Wird ausgeführt, bei Click auf Buchstaben-Navigation)
@@ -269,4 +273,83 @@ function updatePersonalInformationBox(e) {
         innerHTML += "<span>" + e.item.get("OCCUPATION") + "<span>";
     }
     document.getElementById("TextDisplay").innerHTML = innerHTML;
+}
+
+///// ----------- Graph Logic ----------- /////
+
+// Erstellt den Graphen im "graphContainer"-div
+function buildGraph() {
+    var container = document.getElementById("graphContainer");
+    container.innerHTML = "";
+
+    anychart.data.loadJsonFile('/graph_data' + '?person=' + persons + '&secLayer=' + secondLayer, function (data) {
+        // create a chart from the loaded data
+        graphChart = anychart.graph(data);
+
+        // legt den Titel des Graohen fest
+        graphChart.title("Use mouse wheel to zoom, click to highlight connections");
+
+        // sorgt dafür das Einstellungen an den Knoten vorgenommen werden können
+        var nodes = graphChart.nodes();
+
+        // Größe der Knoten
+        nodes.normal().height(4);
+        nodes.hovered().height(5)
+        nodes.selected().height(5);
+
+        // set the fill of nodes
+        nodes.normal().fill("#455a64");  // #ffa000 = Orange
+        nodes.hovered().fill("#333333", 3);
+        nodes.selected().fill("#dd2c00", 3);
+
+        // Umrandung der Knoten
+        nodes.normal().stroke(null);
+        nodes.hovered().stroke("#333333", 3);
+        nodes.selected().stroke("#dd2c00", 3);
+
+        // Einschalten der labels (Bildunterschrift unter den Knoten)
+        graphChart.nodes().labels().enabled(true);
+
+        // enable the alignment of nodes
+        graphChart.interactivity().magnetize(true);
+
+        // set the iteration step, Setzt Anzahl der kanten die maximal gerendert werden, beeinflusst die Ladezeit stark
+        graphChart.layout().iterationCount(500);
+
+        // Einstellungen für die labels
+        // Woher der Text für die Bildunterschrift stammt
+        graphChart.nodes().labels().format("{%id}");
+        // Einstellungen für die Schrift
+        graphChart.nodes().labels().fontSize(5);
+        graphChart.nodes().labels().fontWeight(600);
+
+        // configure the visual settings of edges
+        graphChart.edges().normal().stroke("#64B5F6", 0.5);
+        graphChart.edges().hovered().stroke("#64B5F6", 2);
+        graphChart.edges().selected().stroke("#64B5F6", 1.5);
+
+        // configure tooltips
+        graphChart.tooltip().useHtml(true);
+        graphChart.tooltip().format(function () {
+            if (this.type == "node") {
+                return "<span style='font-weight:bold'>" +
+                    this.id +
+                    "</span><br><br>Connections: " + this.siblings.length;
+            } else {
+                return this.getData("to") + " -> " + this.getData("from");
+            }
+        });
+
+        // Wähle Person, die eingegeben wurde aus und hebe sie damit hervor
+        graphChart.select([persons]);
+        graphChart.fit();
+
+        // Erstellt das Chart
+        graphChart.container("graphContainer");
+        graphChart.draw();
+    });
+    // Invalidate any previous graphChart instance
+    if (graphChart !== undefined) {
+        graphChart.invalidate();
+    }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
 
 /**
- * Stellt die `/relatedLperson` Route bereit, die aus Timeline.js aufgerufen wird.
+ * Stellt die `/relatedPerson` Route bereit, die aus Timeline.js aufgerufen wird.
  */
 @RestController
 @RequestMapping("/relatedPersons")

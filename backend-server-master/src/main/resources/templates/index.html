@@ -14,9 +14,9 @@
     <script src="JavaScript/bootstrap.bundle.min.js"></script>
 
     <!-- AnyChart Library für Timeline Visualisierung -->
-    <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-bundle.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.6.0/js/anychart-gantt.min.js"></script>
-
+    <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-bundle.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-graph.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-data-adapter.min.js"></script>
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
@@ -93,6 +93,7 @@
                     <button class="button" id="zoomOutButton" onclick="zoomOut()">-</button>
                 </div>
 
+
                 <br>
                 <div class="container" style="float:left;padding-left:0;">
                     <div class="btn-toolbar">
@@ -129,20 +130,33 @@
             </div>
             <br>
             <br>
-            <!-- In diesem "Container" wird die Timeline erstellt -->
-            <div id="container" style="height: 630px; width: 75%; float:left; margin-bottom: 15px"></div>
+            <div>
+                <!-- In diesem "Container" wird die Timeline erstellt -->
+                <div id="timelineContainer" style="height: 630px; width: 75%; float:left; margin-bottom: 15px"></div>
 
-            <!-- In diesem "TextDisplay" werden Infos zur Person angezeigt-->
-            <div id="TextDisplay" class="text" style="width: 23%; float:right; margin-bottom: 15px">
-                <h4>Click on a person for more information.</h4>
-                <img class="img"
-                     src='https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png'
-                     width="500" height="500">
+                <!-- In diesem "TextDisplay" werden Infos zur Person angezeigt-->
+                <div id="TextDisplay" class="text" style="height: 630px; width: 23%; float:right; margin-bottom: 15px">
+                    <h4>Click on a person for more information.</h4>
+                    <img class="img"
+                         src='https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png'
+                         width="500" height="500">
+                </div>
             </div>
+
+            <div style="float:left;">
+                <label><b>Show Second Layer</b></label>
+                <label class="checkbox-container">
+                    Expect longer loading </br> times for famous people!
+                    <input title="Expect longer loading times for famous people!" type="checkbox" id="layerCheckbox" onclick="getSubmitFields()">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+
+            <!--In diesem "container" wird der Graph erstellt -->
+            <div id="graphContainer" style="height: 680px;"></div>
             <script src="JavaScript/Timeline.js"></script>
         </main>
     </div>
 </div>
-
 </body>
 </html>
