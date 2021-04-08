@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
 
 /**
- * Stellt die `/person` Route bereit, die aus Timeline.js aufgerufen wird.
+ * Stellt die `/person` Route bereit, die aus main.js aufgerufen wird.
  */
 @RestController
 @RequestMapping("/persons")
@@ -21,7 +21,7 @@ public class PersonController {
      * @param deathdate  Eingegebenes Todesdatum für Personen
      * @param job        Eingegebene Berufsbezeichnung für Personen
      * @param startsWith Ausgewählter Anfangsbuchstabe für Namen einer Person
-     * @return finaler JSON-String mit Timeline-Daten zu gefilterten Personen. Dient als Eingabe für die anychart-gantt.min.js Library im Timeline.js.
+     * @return finaler JSON-String mit Timeline-Daten zu gefilterten Personen. Dient als Eingabe für die anychart-gantt.min.js Library im main.js.
      */
     @GetMapping
     public String filter(@RequestParam(value = "person", required = false, defaultValue = "") String person,
