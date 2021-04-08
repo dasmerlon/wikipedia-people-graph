@@ -109,8 +109,7 @@ public class MySQLconnect {
      */
     public String getPersonData(String person, String birthdate, String deathdate, String job, String startsWith) throws SQLException {
 
-        Statement st = null;
-        st = con.createStatement();
+        Statement st = con.createStatement();
 
         if (person.equals("")) {
             person = "!=" + "'" + person + "'";
@@ -165,14 +164,47 @@ public class MySQLconnect {
     }
 
     /**
+     * Gibt alle Personen, die zur einer gegebenen Person related sind.
+     *
+     * @param  person Name für zu filternde Personen
+     * @param  startsWith   Anfangsbuchstabe für genauere Filter
+     * @return JSONString, welcher die Personendaten aus der SQL-Datenbank beinhaltet
+     */
+    public String getRelatedPersonData(String person, String startsWith) throws SQLException {
+        Statement st = con.createStatement();
+        String sql = String.format("SELECT * FROM PersonData WHERE (PersonData.title in (SELECT PERSON2 FROM Relationships WHERE Relationships.PERSON1 = '%s') OR PersonData.title = '%s')", person, person);
+
+        // Falls ein startsWith mitgeliefert wird, filtern wir darauf zusätzlich.
+        if (!startsWith.isEmpty()) {
+            String startsWithQuery = String.format(" AND PersonData.title LIKE '%s%%'", startsWith);
+            sql += startsWithQuery;
+        }
+
+        ResultSet rs;
+        try {
+            rs = st.executeQuery(sql);
+            JSONArray jsonReceived = ResultSetConverter.convert(rs);
+            System.out.println(jsonReceived);
+            String j = jsonReceived.toString();
+
+            //System.out.println(j);
+            return j;
+
+        } catch (SQLException | JSONException e) {
+            System.out.printf("Anfrage konnte nicht ausgeführt werden: %s", e.getMessage());
+        }
+
+        return null;
+    }
+
+    /**
      * Liest die Beziehungsdaten für den Netzwerkgraph mit den entsprechenden Filtern aus der MySQL-Datenbank aus. Konvertiert das zurückgegebene ResultSet in ein JSONArray mit Hilfe der ResultSetConverter-Klasse.
      * @param  person Name für zu filternde Person
      * @return JSONString, welcher die Beziehungsdaten aus der SQL-Datenbank beinhaltet
      */
 
     public String getRelationships(String person) throws SQLException {
-        Statement st = null;
-        st = con.createStatement();
+        Statement st = con.createStatement();
 
         if (person.equals("")) {
             person = "!=" + "'" + person + "'";
@@ -182,8 +214,7 @@ public class MySQLconnect {
 
         String sql = ("SELECT * FROM Relationships WHERE PERSON1" + person + " ;");
 
-        ResultSet rs = null;
-
+        ResultSet rs;
         try {
             rs = st.executeQuery(sql);
             JSONArray jsonReceived = ResultSetConverter.convert(rs);
