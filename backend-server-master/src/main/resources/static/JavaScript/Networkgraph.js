@@ -1,17 +1,17 @@
 //Variablen, die den Inhalt des Netwerk-Graph definieren und durch den User verändert werden können
-  var persons = "Albert Einstein";
-  secondLayer = false;
+var persons = "Albert Einstein";
+secondLayer = false;
 
 
 //beim initialen Laden Seite wird der Graph mit default-Werten gebaut
 anychart.onDocumentReady(buildGraph());
 
 //Erstellt den Graphen in der "container"-div
- function buildGraph() {
+function buildGraph() {
 
 
-        var container = document.getElementById("container");
-        container.innerHTML = "" ;
+    var container = document.getElementById("container");
+    container.innerHTML = "";
 
 
     anychart.data.loadJsonFile('/graph_data' + '?person=' + persons + '&secLayer=' + secondLayer, function (data) {
@@ -27,9 +27,9 @@ anychart.onDocumentReady(buildGraph());
         var nodes = chart.nodes();
 
         // Größe der Knoten
-        nodes.normal().height(6);
-        nodes.hovered().height(7);
-        nodes.selected().height(7);
+        nodes.normal().height(4);
+        nodes.hovered().height(5)
+        nodes.selected().height(5);
 
         // set the fill of nodes
         nodes.normal().fill("#455a64");  // #ffa000 = Orange
@@ -54,7 +54,7 @@ anychart.onDocumentReady(buildGraph());
         // Woher der Text für die Bildunterschrift stammt
         chart.nodes().labels().format("{%id}");
         // Einstellungen für die Schrift
-        chart.nodes().labels().fontSize(7);
+        chart.nodes().labels().fontSize(5);
         chart.nodes().labels().fontWeight(600);
 
         // configure the visual settings of edges
@@ -62,16 +62,17 @@ anychart.onDocumentReady(buildGraph());
         chart.edges().hovered().stroke("#64B5F6", 2);
         chart.edges().selected().stroke("#64B5F6", 1.5);
 
-       // configure tooltips
-       chart.tooltip().useHtml(true);
-       chart.tooltip().format(function() {
-         if (this.type == "node") {
-           return "<span style='font-weight:bold'>" +
-                  this.id +
-                  "</span><br><br>Connections: " + this.siblings.length ;
-         } else {
-           return this.getData("to") + " -> " + this.getData("from");
-         }});
+        // configure tooltips
+        chart.tooltip().useHtml(true);
+        chart.tooltip().format(function () {
+            if (this.type == "node") {
+                return "<span style='font-weight:bold'>" +
+                    this.id +
+                    "</span><br><br>Connections: " + this.siblings.length;
+            } else {
+                return this.getData("to") + " -> " + this.getData("from");
+            }
+        });
 
 
         //wähle Person, die eingegeben wurde aus und hebe sie damit hervor
@@ -86,12 +87,12 @@ anychart.onDocumentReady(buildGraph());
 
     chart.invalidate();
 
-};
+}
 
 
 //Aktualisiert die Variablen mit den eingegebenen Werten aus dem Personen-Suchfeld und der Checkbox und baut neuen Graphen
 function getSubmitFields() {
-  persons = document.getElementById("PersonInput").value;
-  secondLayer = document.getElementById("layerCheckbox").checked;
-  buildGraph();
+    persons = document.getElementById("PersonInput").value;
+    secondLayer = document.getElementById("layerCheckbox").checked;
+    buildGraph();
 }
