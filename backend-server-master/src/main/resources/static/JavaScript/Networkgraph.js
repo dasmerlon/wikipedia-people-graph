@@ -1,12 +1,13 @@
+//Variablen, die den Inhalt des Netwerk-Graph definieren und durch den User verändert werden können
   var persons = "Albert Einstein";
   secondLayer = false;
 
 
+//beim initialen Laden Seite wird der Graph mit default-Werten gebaut
+anychart.onDocumentReady(buildGraph());
 
-anychart.onDocumentReady(buildeMal());
-
- function buildeMal() {
-    //anychart.data.loadJsonFile(/JSONs/testdaten.json', function (data) {
+//Erstellt den Graphen in der "container"-div
+ function buildGraph() {
 
 
         var container = document.getElementById("container");
@@ -21,8 +22,6 @@ anychart.onDocumentReady(buildeMal());
 
         // legt den Titel des Graohen fest
         chart.title("Use mouse wheel to zoom, click to highlight connections");
-
-
 
         // sorgt dafür das Einstellungen an den Knoten vorgenommen werden können
         var nodes = chart.nodes();
@@ -48,7 +47,7 @@ anychart.onDocumentReady(buildeMal());
         // enable the alignment of nodes
         chart.interactivity().magnetize(true);
 
-        // set the iteration step Setzt Anzahl der kanten die maximal gerendert werden, beeinflusst die Ladezeit stark
+        // set the iteration step, Setzt Anzahl der kanten die maximal gerendert werden, beeinflusst die Ladezeit stark
         chart.layout().iterationCount(500);
 
         // Einstellungen für die labels
@@ -62,10 +61,6 @@ anychart.onDocumentReady(buildeMal());
         chart.edges().normal().stroke("#64B5F6", 0.5);
         chart.edges().hovered().stroke("#64B5F6", 2);
         chart.edges().selected().stroke("#64B5F6", 1.5);
-/*
-        chart.edges().normal().fill("#ffa000", 2, "10 5", "round");
-        chart.edges().hovered().fill("#ffa000", 4, "10 5", "round");
-        chart.edges().selected().fill("#ffa000", 4);*/
 
        // configure tooltips
        chart.tooltip().useHtml(true);
@@ -93,8 +88,10 @@ anychart.onDocumentReady(buildeMal());
 
 };
 
+
+//Aktualisiert die Variablen mit den eingegebenen Werten aus dem Personen-Suchfeld und der Checkbox und baut neuen Graphen
 function getSubmitFields() {
   persons = document.getElementById("PersonInput").value;
   secondLayer = document.getElementById("layerCheckbox").checked;
-  buildeMal();
+  buildGraph();
 }
