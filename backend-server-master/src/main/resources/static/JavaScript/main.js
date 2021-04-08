@@ -348,8 +348,9 @@ function buildGraph() {
         graphChart.container("graphContainer");
         graphChart.draw();
     });
+
     // Invalidate any previous graphChart instance
-    if (graphChart !== undefined) {
+    if (typeof graphChart === 'object' && graphChart.hasOwnProperty('invalidate')) {
         graphChart.invalidate();
     }
 }

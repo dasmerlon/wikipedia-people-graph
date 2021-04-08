@@ -134,11 +134,14 @@ public class GraphController {
 
             // get relations from database
             String jsonout = con.getRelationships(nextPerson);
-            String jsonProcessed = converter(jsonout, false);
+            // Try to get the next object for the layer.
+            // Ignore errors if this fails. We have a huge amount of data and some of it breaks when converting to json.
+            try {
+                String jsonProcessed = converter(jsonout, false);
 
-            JSONObject processedobj = new JSONObject(jsonProcessed);
-            alleDatenLayer2.put(processedobj);
-
+                JSONObject processedobj = new JSONObject(jsonProcessed);
+                alleDatenLayer2.put(processedobj);
+            } catch (NullPointerException e) {}
         }
 
         JSONArray allNodes = new JSONArray();
