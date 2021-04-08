@@ -2,7 +2,6 @@ package uhh_lt.datenbank;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 
 /**
- * Diese Klasse stellt eine Verbindung zu MySQL her und kann Daten in die Datenbank speichern, bestehende Zeilen aktualisieren und Daten auslesen.
+ * Diese Klasse stellt eine Verbindung zu einer MySQL-Datenbank her und kann die Daten auslesen.
+ * Die Zugangsdaten für die MySQL-Datenbank werden in credentials.txt definiert
  */
 public class MySQLconnect {
     private static Connection con = null;
@@ -99,8 +99,13 @@ public class MySQLconnect {
     }
 
     /**
-     * Liest Watson Daten aus der Datenbank aus und errechnet Durchschnittswerte für den Sentiment Score und die Emotions.
-     * * @return ein double Array mit den Watson Werten in der Reihenfolge Sentiment, Sadness, Joy, Fear, Disgust, Anger
+     * Liest die Personendaten für die Timeline mit den entsprechenden Filtern aus der MySQL-Datenbank aus. Konvertiert das zurückgegebene ResultSet in ein JSONArray mit Hilfe der ResultSetConverter-Klasse.
+     * @param  person Name für zu filternde Personen
+     * @param  birthdate Geburtsdatum für zu filternde Personen
+     * @param  deathdate Todesdatum für zu filternde Personen
+     * @param  job Berufsbezeichnung für zu filternde Personen
+     * @param  startsWith Anfangsbuchstabe für zu filternde Personen
+     * @return JSONString, welcher die Personendaten aus der SQL-Datenbank beinhaltet
      */
     public String getPersonData(String person, String birthdate, String deathdate, String job, String startsWith) throws SQLException {
 
@@ -113,18 +118,19 @@ public class MySQLconnect {
             person = " LIKE" + "'%" + person + "%'";
         }
 
-        // Geburts und Todesdatum sind in der DB leider als String gespeichert, daher können wir keine "Zeitbereiche" eingrenzen...
-        // TODO Genaues Datum funktioniert aber auch nicht, in welchem Format liegt das Datum in der DB vor? Ansonsten die Buttons lieber löschen
+        // Geburts und Todesdatum sind in unserer DB leider als String gespeichert, daher können wir keine "Zeitbereiche" eingrenzen...
         if (birthdate.equals("")) {
             birthdate = "!=" + "'" + birthdate + "'";
         } else {
-            birthdate = "=" + "'" + birthdate + "'";
+
+            birthdate = "=" + "'AD-" + birthdate + "'";
         }
 
         if (deathdate.equals("")) {
             deathdate = "!=" + "'" + deathdate + "'";
         } else {
-            deathdate = "=" + "'" + deathdate + "'";
+
+            deathdate = "=" + "'AD-" + deathdate + "'";
         }
 
         if (job.equals("")) {
@@ -158,6 +164,11 @@ public class MySQLconnect {
         return null;
     }
 
+    /**
+     * Liest die Beziehungsdaten für den Netzwerkgraph mit den entsprechenden Filtern aus der MySQL-Datenbank aus. Konvertiert das zurückgegebene ResultSet in ein JSONArray mit Hilfe der ResultSetConverter-Klasse.
+     * @param  person Name für zu filternde Person
+     * @return JSONString, welcher die Beziehungsdaten aus der SQL-Datenbank beinhaltet
+     */
 
     public String getRelationships(String person) throws SQLException {
         Statement st = null;
@@ -172,17 +183,15 @@ public class MySQLconnect {
         String sql = ("SELECT * FROM Relationships WHERE PERSON1" + person + " ;");
 
         ResultSet rs = null;
-        //TODO eventuell als JSONARRAY anpassen
+
         try {
             rs = st.executeQuery(sql);
             JSONArray jsonReceived = ResultSetConverter.convert(rs);
             System.out.println(jsonReceived);
             String j = jsonReceived.toString();
 
-            //JSONArray newJArray = new JSONArray(j);
-            //System.out.println(j);
-
             return j;
+
         } catch (SQLException | JSONException e) {
             System.out.println("Anfrage konnte nicht ausgeführt werden");
         }
