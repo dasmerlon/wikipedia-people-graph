@@ -7,12 +7,11 @@ import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
 
 /**
- * Stellt die filter-Methode bereit, die aus Timeline.js aufgerufen wird.
+ * Stellt die `/person` Route bereit, die aus Timeline.js aufgerufen wird.
  */
-
 @RestController
-@RequestMapping("/filter")
-public class TimelineController {
+@RequestMapping("/persons")
+public class PersonController {
 
      /**
      * Erstellt ein Objekt der Klasse MySQLconnect und nutzt dieses um die mit den Parametern gefilterten Personen-Daten von einer SQL-Datenbank abzurufen.
@@ -24,7 +23,6 @@ public class TimelineController {
      * @param  startsWith Ausgewählter Anfangsbuchstabe für Namen einer Person
      * @return finaler JSON-String mit Timeline-Daten zu gefilterten Personen. Dient als Eingabe für die anychart-gantt.min.js Library im Timeline.js.
      */
-
     @GetMapping
     public String filter(@RequestParam(value = "person", required = false, defaultValue = "") String person,
                         @RequestParam(value = "birthdate", required = false, defaultValue = "") String birthdate,
@@ -34,10 +32,7 @@ public class TimelineController {
 
         MySQLconnect con = new MySQLconnect();
 
-        String json = con.getPersonData(person, birthdate, deathdate, job, startsWith);
-
-        return json;
+        return con.getPersonData(person, birthdate, deathdate, job, startsWith);
     }
-
 }
 
