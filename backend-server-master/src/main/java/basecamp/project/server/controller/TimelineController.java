@@ -1,7 +1,5 @@
 package basecamp.project.server.controller;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,10 +14,7 @@ import uhh_lt.datenbank.MySQLconnect;
 @RequestMapping("/filter")
 public class TimelineController {
 
-    @GetMapping
-
-
-    /**
+     /**
      * Erstellt ein Objekt der Klasse MySQLconnect und nutzt dieses um die mit den Parametern gefilterten Personen-Daten von einer SQL-Datenbank abzurufen.
      *
      * @param  person  Eingegebener Name für Personen
@@ -30,6 +25,7 @@ public class TimelineController {
      * @return finaler JSON-String mit Timeline-Daten zu gefilterten Personen. Dient als Eingabe für die anychart-gantt.min.js Library im Timeline.js.
      */
 
+    @GetMapping
     public String filter(@RequestParam(value = "person", required = false, defaultValue = "") String person,
                         @RequestParam(value = "birthdate", required = false, defaultValue = "") String birthdate,
                         @RequestParam(value = "deathdate", required = false, defaultValue = "") String deathdate,
