@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
 
+
 /**
  * Stellt die `/person` Route bereit, die aus main.js aufgerufen wird.
  */
@@ -14,14 +15,15 @@ import uhh_lt.datenbank.MySQLconnect;
 public class PersonController {
 
     /**
-     * Erstellt ein Objekt der Klasse MySQLconnect und nutzt dieses um die mit den Parametern gefilterten Personen-Daten von einer SQL-Datenbank abzurufen.
+     * Erstellt ein Objekt der Klasse MySQLconnect und nutzt dieses, um die mit den Parametern gefilterten
+     * Personen-Daten von einer SQL-Datenbank abzurufen.
      *
      * @param person     Eingegebener Name für Personen
      * @param birthdate  Eingegebenes Geburtsdatum für Personen
      * @param deathdate  Eingegebenes Todesdatum für Personen
      * @param job        Eingegebene Berufsbezeichnung für Personen
      * @param startsWith Ausgewählter Anfangsbuchstabe für Namen einer Person
-     * @return finaler JSON-String mit Timeline-Daten zu gefilterten Personen. Dient als Eingabe für die anychart-gantt.min.js Library im main.js.
+     * @return finaler JSON-String mit Personen-Daten. Dient als Eingabe für die anychart-gantt.min.js Library im main.js.
      */
     @GetMapping
     public String filter(@RequestParam(value = "person", required = false, defaultValue = "") String person,
@@ -31,8 +33,6 @@ public class PersonController {
                          @RequestParam(value = "startsWith", required = false, defaultValue = "") String startsWith) throws Exception {
 
         MySQLconnect con = new MySQLconnect();
-
         return con.getPersonData(person, birthdate, deathdate, job, startsWith);
     }
 }
-

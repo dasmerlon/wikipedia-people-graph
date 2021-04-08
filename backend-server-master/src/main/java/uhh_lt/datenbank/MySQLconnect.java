@@ -2,6 +2,7 @@ package uhh_lt.datenbank;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,9 +10,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 
+
 /**
  * Diese Klasse stellt eine Verbindung zu einer MySQL-Datenbank her und kann die Daten auslesen.
- * Die Zugangsdaten für die MySQL-Datenbank werden in credentials.txt definiert
+ * Die Zugangsdaten für die MySQL-Datenbank werden in credentials.txt definiert.
  */
 public class MySQLconnect {
     private static Connection con = null;
@@ -21,7 +23,6 @@ public class MySQLconnect {
      */
     public MySQLconnect() throws Exception {
         // Read the credentials from the `resource/credentials.txt` file.
-        // That way we don't have to hardcode stuff in our code base.
         InputStream credentials = this.getClass().getClassLoader()
                 .getResourceAsStream("credentials.txt");
         if (credentials == null) {
@@ -66,12 +67,11 @@ public class MySQLconnect {
             throw new Exception("Your credentials file has to have a host, port, dbname, user and password");
         }
 
-
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");    // Datenbanktreiber für JDBC Schnittstellen laden.
+            // Datenbanktreiber für JDBC Schnittstellen laden.
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
             String URI = String.format("jdbc:mysql://%s:%s/%s?useSSL=false", dbHost, dbPort, dbName);
-
             System.out.printf("Try to connect to %s with user %s and pass %s%n", URI, dbUser, dbPass);
 
             // Get Database connection
@@ -99,16 +99,17 @@ public class MySQLconnect {
     }
 
     /**
-     * Liest die Personendaten für die Timeline mit den entsprechenden Filtern aus der MySQL-Datenbank aus. Konvertiert das zurückgegebene ResultSet in ein JSONArray mit Hilfe der ResultSetConverter-Klasse.
-     * @param  person Name für zu filternde Personen
-     * @param  birthdate Geburtsdatum für zu filternde Personen
-     * @param  deathdate Todesdatum für zu filternde Personen
-     * @param  job Berufsbezeichnung für zu filternde Personen
-     * @param  startsWith Anfangsbuchstabe für zu filternde Personen
+     * Liest die Personendaten für die Timeline mit den entsprechenden Filtern aus der MySQL-Datenbank aus.
+     * Konvertiert das zurückgegebene ResultSet in ein JSONArray mit Hilfe der ResultSetConverter-Klasse.
+     *
+     * @param person     Name für zu filternde Personen
+     * @param birthdate  Geburtsdatum für zu filternde Personen
+     * @param deathdate  Todesdatum für zu filternde Personen
+     * @param job        Berufsbezeichnung für zu filternde Personen
+     * @param startsWith Anfangsbuchstabe für zu filternde Personen
      * @return JSONString, welcher die Personendaten aus der SQL-Datenbank beinhaltet
      */
     public String getPersonData(String person, String birthdate, String deathdate, String job, String startsWith) throws SQLException {
-
         Statement st = con.createStatement();
 
         if (person.equals("")) {
@@ -146,28 +147,23 @@ public class MySQLconnect {
 
         String sql = ("SELECT * FROM PersonData WHERE (OCCUPATION" + job + " OR OFFICE" + job + ") AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND (TITLE" + person + " AND TITLE" + startsWith + ") LIMIT 200" + " ;");
 
-        ResultSet rs = null;
+        ResultSet rs;
         try {
             rs = st.executeQuery(sql);
             JSONArray jsonReceived = ResultSetConverter.convert(rs);
             System.out.println(jsonReceived);
-            String j = jsonReceived.toString();
-
-            //System.out.println(j);
-            return j;
-
+            return jsonReceived.toString();
         } catch (SQLException | JSONException e) {
             System.out.printf("Anfrage konnte nicht ausgeführt werden: %s", e.getMessage());
         }
-
         return null;
     }
 
     /**
-     * Gibt alle Personen, die zur einer gegebenen Person related sind.
+     * Gibt alle Personen, die zur einer gegebenen Person in Beziehung stehen.
      *
-     * @param  person Name für zu filternde Personen
-     * @param  startsWith   Anfangsbuchstabe für genauere Filter
+     * @param person     Name für zu filternde Personen
+     * @param startsWith Anfangsbuchstabe für genauere Filter
      * @return JSONString, welcher die Personendaten aus der SQL-Datenbank beinhaltet
      */
     public String getRelatedPersonData(String person, String startsWith) throws SQLException {
@@ -185,24 +181,20 @@ public class MySQLconnect {
             rs = st.executeQuery(sql);
             JSONArray jsonReceived = ResultSetConverter.convert(rs);
             System.out.println(jsonReceived);
-            String j = jsonReceived.toString();
-
-            //System.out.println(j);
-            return j;
-
+            return jsonReceived.toString();
         } catch (SQLException | JSONException e) {
             System.out.printf("Anfrage konnte nicht ausgeführt werden: %s", e.getMessage());
         }
-
         return null;
     }
 
     /**
-     * Liest die Beziehungsdaten für den Netzwerkgraph mit den entsprechenden Filtern aus der MySQL-Datenbank aus. Konvertiert das zurückgegebene ResultSet in ein JSONArray mit Hilfe der ResultSetConverter-Klasse.
-     * @param  person Name für zu filternde Person
+     * Liest die Beziehungsdaten für den Netzwerkgraph mit den entsprechenden Filtern aus der MySQL-Datenbank aus.
+     * Konvertiert das zurückgegebene ResultSet in ein JSONArray mit Hilfe der ResultSetConverter-Klasse.
+     *
+     * @param person Name für zu filternde Person
      * @return JSONString, welcher die Beziehungsdaten aus der SQL-Datenbank beinhaltet
      */
-
     public String getRelationships(String person) throws SQLException {
         Statement st = con.createStatement();
 
@@ -219,14 +211,10 @@ public class MySQLconnect {
             rs = st.executeQuery(sql);
             JSONArray jsonReceived = ResultSetConverter.convert(rs);
             System.out.println(jsonReceived);
-            String j = jsonReceived.toString();
-
-            return j;
-
+            return jsonReceived.toString();
         } catch (SQLException | JSONException e) {
             System.out.println("Anfrage konnte nicht ausgeführt werden");
         }
-
         return null;
     }
 }

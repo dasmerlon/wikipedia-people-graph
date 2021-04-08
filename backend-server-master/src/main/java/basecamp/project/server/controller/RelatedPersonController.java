@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
 
+
 /**
  * Stellt die `/relatedPerson` Route bereit, die aus main.js aufgerufen wird.
  */
@@ -18,17 +19,14 @@ public class RelatedPersonController {
      *
      * @param person     Eingegebener Name für Personen
      * @param startsWith Ausgewählter Anfangsbuchstabe für Namen einer Person
-     * @return finaler JSON-String mit Timeline-Daten zu gefilterten Personen. Dient als Eingabe für die anychart-gantt.min.js Library im main.js.
+     * @return finaler JSON-String mit Personen-Daten. Dient als Eingabe für die anychart-gantt.min.js Library im main.js.
      */
     @GetMapping
     public String filter(
             @RequestParam(value = "person") String person,
             @RequestParam(value = "startsWith", required = false, defaultValue = "") String startsWith
-        ) throws Exception {
-
+    ) throws Exception {
         MySQLconnect con = new MySQLconnect();
-
         return con.getRelatedPersonData(person, startsWith);
     }
 }
-

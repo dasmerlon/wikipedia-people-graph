@@ -1,10 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.80.0">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="Hugo 0.80.0" name="generator">
     <title>About</title>
 
     <!-- Bootstrap core CSS -->
@@ -14,26 +13,26 @@
     <link href="css/dashboard.css" rel="stylesheet">
 
     <script src="JavaScript/bootstrap.bundle.min.js"></script>
-
 </head>
-
 
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/about">Wikipedia People Graph</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <button aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"
+            class="navbar-toggler position-absolute d-md-none collapsed" data-bs-target="#sidebarMenu"
+            data-bs-toggle="collapse"
+            type="button">
         <span class="navbar-toggler-icon"></span>
     </button>
 </header>
 
 <div class="container-fluid">
     <div class="row">
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarMenu">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/">
+                        <a aria-current="page" class="nav-link" href="/">
                             <span data-feather="home"></span>
                             Timeline
                         </a>
@@ -52,27 +51,35 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">About the project</h1>
             </div>
-            <div class ="text">
+            <div class="text">
+                Our team and this project was formed in context of a practical training by the <a
+                    href="https://www.inf.uni-hamburg.de/inst/basecamp.html">base.camp</a> at the University of Hamburg.
+                <br>
+                The "Wikipedia People Graph"-team consists of 4 computer science students, who want to make the wealth
+                of Wikipedia's information more visual and usable.
+                <br><br>
+                We are especially interested in the personal data of Wikipedia. The goal of this project is to
+                create an easy entry to Wikipedias's personal data.
+                We want our users to be able to easily explore the persons of wikipedia and their relations. For this
+                purpose we built the timeline and the network graph.
+                The data we use is based on several Hadoop MapReduce Jobs, by which we were able to analyse
+                <a href="https://dumps.wikimedia.org/"> Wikimedia dump files</a>.
+                <br><br>
+                We would like to thank the base.camp of University of Hamburg, who kindly provided us their
+                Hadoop cluster. We also would like to thank Eugen Ruppert from the base.camp team for his continuous and
+                very helpful support during the project.
 
-            Our team and this project was formed in context of a practical training by the <a href="https://www.inf.uni-hamburg.de/inst/basecamp.html">base.camp</a> at the University of Hamburg.
-            <br>The "Wikipedia People Graph"-team consists of 4 computer science students, who want to make the wealth of Wikipedia's information more visual and usable.
-            <br><br>We are especially interested in the personal data of Wikipedia. The goal of this project is to create an easy entry to Wikipedias's personal data.
-            We want our users to be able to easily explore the persons of wikipedia and their relations. For this purpose we built the timeline and the network graph.
-            The data we use is based on several Hadoop MapReduce Jobs, by which we were able to analyse <a href="https://dumps.wikimedia.org/"> Wikimedia dump files</a>.
-            <br><br>We would like to thank the base.camp of University of Hamburg, who kindly provided us their Hadoop cluster. We also would like to thank Eugen Ruppert from the base.camp team for his continuous and very helpful support during the project.
+                <br><br><b>If you have any questions or interest in our project please contact:</b>
 
-               <br><br><b>If you have any questions or interest in our project please contact:</b>
+                <br>merle.hoffmann[at]studium.uni-hamburg.de
+                <br>henning.moellers[at]studium.uni-hamburg.de
+                <br>christian.wolff[at]studium.uni-hamburg.de
+                <br>murad.caliskan[at]studium.uni-hamburg.de
 
-                <br>merle.hoffmann&#64;studium.uni-hamburg.de
-                <br>henning.moellers&#64;studium.uni-hamburg.de
-                <br>christian.wolff&#64;studium.uni-hamburg.de
-                <br>murad.caliskan&#64;studium.uni-hamburg.de
-
-                <br><br><b>The source code and documentation is available on our <a href="https://github.com/dasmerlon/wikipedia-people-graph">Git repository</a>. </b>
-
+                <br><br><b>The source code and documentation is available on our <a
+                    href="https://github.com/dasmerlon/wikipedia-people-graph">Git repository</a>. </b>
 
                 <br><br><b>Enjoy the people of Wikipedia!</b>
-
             </div>
         </main>
     </div>

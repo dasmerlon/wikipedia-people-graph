@@ -36,6 +36,10 @@ input[type="text"]:focus, input[type="date"]:focus {
     height: auto;
 }
 
+/*
+ * Button
+ */
+
 .button {
     background-color: #B3DBFB;
     color: black;
@@ -55,6 +59,10 @@ input[type="text"]:focus, input[type="date"]:focus {
     background-color: #64B5F6;
     border: 2px solid #64B5F6;
 }
+
+/*
+ * Checkbox
+ */
 
 /* The checkbox container */
 .checkbox-container {

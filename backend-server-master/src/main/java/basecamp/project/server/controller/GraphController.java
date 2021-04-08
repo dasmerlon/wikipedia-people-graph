@@ -3,51 +3,48 @@ package basecamp.project.server.controller;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.parser.ParseException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uhh_lt.datenbank.MySQLconnect;
 
+
 /**
- * Stellt die filter-Methode bereit, die aus Networkgraph.js aufgerufen wird.
+ * Stellt die `/graph_data` Route bereit, die aus main.js aufgerufen wird.
  */
 @RestController
 @RequestMapping("/graph_data")
 public class GraphController {
 
-
     /**
-     * Erstellt ein Objekt der Klasse MySQLconnect und nutzt dieses um die mit den Parametern gefilterten Beziehungsdaten-Daten von einer SQL-Datenbank abzurufen.
+     * Erstellt ein Objekt der Klasse MySQLconnect und nutzt dieses, um die mit den Parametern gefilterten
+     * Beziehungsdaten-Daten von einer SQL-Datenbank abzurufen.
      *
      * @param person   Eingegebener Name für Person
      * @param secLayer Eingegebener Boolean-Wert, ob auch die Personen die die Personen kennen, welche die eingegebene Person (param person) kennen angezeigt werden
-     * @return finaler JSON-String mit Graph-Daten zu gefilterten Beziehungen. Dient als Eingabe für die anychart-graph.min.js Library in Networkgraph.js.
+     * @return finaler JSON-String mit Graph-Daten zu gefilterten Beziehungen. Dient als Eingabe für die anychart-graph.min.js Library in main.js.
      */
     @GetMapping
     public String filter(@RequestParam(value = "person", required = false, defaultValue = "") String person,
                          @RequestParam(value = "secLayer", required = false, defaultValue = "") Boolean secLayer) throws Exception {
 
-
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");
 
         String jsonout = con.getRelationships(person);
-
         System.out.println("WERT SEC LAYER = " + secLayer);
-        String jsonProcessed = converter(jsonout, secLayer); //vorher true
 
-        return jsonProcessed;
+        return converter(jsonout, secLayer);
     }
 
-
     /**
-     * Bringt den Input-Json/String (param jsonStr) in das richtige Format für eine Verarbeitung in Networkgraph.js.
-     * Durch den Aufruf weiterer Methoden aus dieser Klasse werden außerdem ggf. indirekte Beziehungen zur Person (zweite Ebene) im Ausgabe-Datenset ergänzt und formatiert.
+     * Bringt den Input-Json/String (param jsonStr) in das richtige Format für eine Verarbeitung in main.js.
+     * Durch den Aufruf weiterer Methoden aus dieser Klasse werden außerdem ggf. indirekte Beziehungen zur Person
+     * (zweite Ebene) im Ausgabe-Datenset ergänzt und formatiert.
      *
      * @param jsonStr JSON-String der von der MySQLconnect-Klasse erzeugt wird
-     * @param layer0  Boolean-Wert, der nur dann true ist wenn es sich beim param jsonStr um direkte Beziehungen zur eingegebenen Person handelt (erste Ebene).
+     * @param layer0  Boolean-Wert, der nur dann true ist, wenn es sich beim param jsonStr um direkte Beziehungen zur eingegebenen Person handelt (erste Ebene).
      * @return finaler JSON-String mit Graph-Daten zu gefilterten Beziehungen (ggf. mit Beziehungen auf zweiter Ebene).
      */
     public String converter(String jsonStr, Boolean layer0) throws Exception {
@@ -58,7 +55,7 @@ public class GraphController {
         JSONArray edgesArray = new JSONArray();
         JSONArray contactPersonArray = new JSONArray();
 
-        //build nodes
+        // build nodes
         for (int i = 0; i < inputArray.length(); i++) {
             JSONObject o2 = inputArray.getJSONObject(i);
             String neueId1 = (String) o2.get("PERSON2");
@@ -78,11 +75,10 @@ public class GraphController {
             inputArray.getJSONObject(i);
         }
 
-        //build edges
+        // build edges
         for (int i = 0; i < inputArray.length(); i++) {
             JSONObject o2 = inputArray.getJSONObject(i);
 
-            //String neueId1 = ((JSONObject) o).getString("PERSON2");
             String neueId1 = (String) o2.get("PERSON2");
             String neueId2 = (String) o2.get("PERSON1");
             JSONObject edge = new JSONObject();
@@ -90,21 +86,19 @@ public class GraphController {
             edge.put("to", neueId2);
 
             edgesArray.put(edge);
-
         }
 
-        //build final JSON output
+        // build final JSON output
         JSONObject obj = new JSONObject();
         obj.put("nodes", nodesArray);
         obj.put("edges", edgesArray);
-
 
         System.out.println("JSON OBJECT " + obj);
         System.out.println("JSON OBJECT TO STRING " + obj);
         System.out.println("contactPersonArray " + contactPersonArray);
 
-        //Wenn weitere Beziehungsebene gezogen werden soll
-        if (layer0 == true) {
+        // Wenn weitere Beziehungsebene gezogen werden soll
+        if (layer0) {
             JSONObject out = getSecondLayer(contactPersonArray, obj);
 
             System.out.println("FINAL OUT" + out);
@@ -116,14 +110,14 @@ public class GraphController {
 
     /**
      * Zieht sich die Beziehungen zu den Beziehungspersonen aus erster Ebene (mit Hilfe der MySQLconnect Klasse).
-     * Durch den Aufruf einer weiteren Methoden aus dieser Klasse (MergeLayer0AndLayer1) werden die Beziehungen aus dieser Ebene und der ersten Ebene(aus converter) anschließend zusammengengeführt.
+     * Durch den Aufruf einer weiteren Methoden aus dieser Klasse (MergeLayer0AndLayer1) werden die Beziehungen
+     * aus dieser Ebene und der ersten Ebene(aus converter) anschließend zusammengengeführt.
      *
      * @param nodesLayer1   JSON-Array, welcher die Kontaktpersonen zur gefilterten Person beinhaltet.
      * @param layer0Ausgabe JSONObject, welches die finale Ausgabe der ersten Ebene (aus converter) beinhaltet (wird in MergeLayer0AndLayer1 benötigt).
      * @return finales JSON-Object mit zusammengeführten Beziehungsdaten aus erster und zweiter Ebene.
      */
-    public JSONObject getSecondLayer(JSONArray nodesLayer1, JSONObject layer0Ausgabe) throws Exception //INPUT CONTACT PERSON ARRAY
-    {
+    public JSONObject getSecondLayer(JSONArray nodesLayer1, JSONObject layer0Ausgabe) throws Exception {
         MySQLconnect con = new MySQLconnect();
         System.out.println("Connector erstellt");
         JSONArray alleDatenLayer2 = new JSONArray();
@@ -141,14 +135,15 @@ public class GraphController {
 
                 JSONObject processedobj = new JSONObject(jsonProcessed);
                 alleDatenLayer2.put(processedobj);
-            } catch (NullPointerException e) {}
+            } catch (NullPointerException ignored) {
+            }
         }
 
         JSONArray allNodes = new JSONArray();
         JSONArray allEdges = new JSONArray();
 
         // alleDatenLayer2 besteht aus mehreren converter Outputs
-        // alleDatenLayer2 structure = [ { nodes:[{},{},{}], edges:[{},{},{}] } ,    { nodes:[{},{},{}], edges:[{},{},{}] } ]
+        // alleDatenLayer2 structure = [ { nodes:[{},{},{}], edges:[{},{},{}] } ,  { nodes:[{},{},{}], edges:[{},{},{}] } ]
         for (int i = 0; i < alleDatenLayer2.length(); i++) {
             JSONObject o3 = alleDatenLayer2.getJSONObject(i);
             JSONArray nodesInO = (JSONArray) o3.get("nodes");
@@ -156,20 +151,19 @@ public class GraphController {
 
             for (int j = 0; j < nodesInO.length(); j++) {
                 String nextPerson = (String) nodesInO.getJSONObject(j).get("id");
-
-                JSONObject lulu = new JSONObject();
-                lulu.put("id", nextPerson);
-                allNodes.put(lulu);
+                JSONObject node = new JSONObject();
+                node.put("id", nextPerson);
+                allNodes.put(node);
             }
 
             for (int z = 0; z < edgesInO.length(); z++) {
                 String fromPerson = (String) edgesInO.getJSONObject(z).get("from");
                 String toPerson = (String) edgesInO.getJSONObject(z).get("to");
 
-                JSONObject lala = new JSONObject();
-                lala.put("from", fromPerson);
-                lala.put("to", toPerson);
-                allEdges.put(lala);
+                JSONObject edge = new JSONObject();
+                edge.put("from", fromPerson);
+                edge.put("to", toPerson);
+                allEdges.put(edge);
             }
         }
 
@@ -181,13 +175,13 @@ public class GraphController {
     }
 
     /**
-     * Fügt die die beiden JSON-Objekte mit den Beziehungen aus Ebene 1 und aus Ebene 2 zu einem JSON-Objekt zusammen
+     * Fügt die die beiden JSON-Objekte mit den Beziehungen aus Ebene 1 und aus Ebene 2 zu einem JSON-Objekt zusammen.
      *
      * @param NodesEdgesLayer1 JSON-Objekt, welches die Beziehungen auf der zweiten Ebene enthält, Structure = { nodes:[{},{},{}], edges:[{},{},{}] }
      * @param NodesEdgesLayer0 JSON-Objekt, welches die Beziehungen auf der erster Ebene enthält, Structure = { nodes:[{},{},{}], edges:[{},{},{}] }
      * @return finales JSON-Object mit zusammengeführten Beziehungsdaten aus erster und zweiter Ebene.
      */
-    public JSONObject MergeLayer0AndLayer1(JSONObject NodesEdgesLayer1, JSONObject NodesEdgesLayer0) throws JSONException, ParseException {
+    public JSONObject MergeLayer0AndLayer1(JSONObject NodesEdgesLayer1, JSONObject NodesEdgesLayer0) throws JSONException {
 
         JSONArray nodesComplete = new JSONArray();
         JSONArray edgesComplete = new JSONArray();
@@ -220,7 +214,6 @@ public class GraphController {
         // Kopiere alle nodes aus layer1 in finales nodes-Array
         for (int i = 0; i < nodesInLayer1.length(); i++) {
             String nextPerson = (String) nodesInLayer1.getJSONObject(i).get("id");
-
             JSONObject node = new JSONObject();
             node.put("id", nextPerson);
             nodesComplete.put(node);
@@ -245,4 +238,3 @@ public class GraphController {
         return (out);
     }
 }
-
