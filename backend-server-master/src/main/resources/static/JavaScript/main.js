@@ -26,9 +26,9 @@ function buildTimeline() {
     // Andernfalls werden alle Personen angezeigt, die auf die momentanen Form-Filterkriteren zutreffen.
     let url;
     if (relatedPersonsOnly) {
-        url = '/relatedPersons' + '?person=' + persons + '&startsWith=' + startsWith;
+        url = './relatedPersons' + '?person=' + persons + '&startsWith=' + startsWith;
     } else {
-        url = '/persons' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession + '&startsWith=' + startsWith;
+        url = './persons' + '?person=' + persons + '&birthdate=' + firstdate + '&deathdate=' + enddate + '&job=' + profession + '&startsWith=' + startsWith;
     }
 
     anychart.data.loadJsonFile(url, function (data) {
@@ -358,7 +358,7 @@ function buildGraph() {
     const container = document.getElementById("graphContainer");
     container.innerHTML = "";
 
-    anychart.data.loadJsonFile('/graph_data' + '?person=' + persons + '&secLayer=' + secondLayer, function (data) {
+    anychart.data.loadJsonFile('./graph_data' + '?person=' + persons + '&secLayer=' + secondLayer, function (data) {
         // create a chart from the loaded data
         graphChart = anychart.graph(data);
 
