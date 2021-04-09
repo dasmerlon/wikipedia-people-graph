@@ -150,25 +150,33 @@ function buildTimeline() {
     });
 }
 
-// zoom the timeline in
+/**
+ * Zoomt in die Timeline rein
+ */
 function zoomIn() {
     timelineChart.zoomIn(2);
 }
 
-// zoom the timeline out
+/**
+ * Zoomt aus der Timeline raus
+ */
 function zoomOut() {
     timelineChart.zoomOut(2);
 }
 
-// Aktualisiert die Variablen mit den eingegebenen Werten aus den Filter-Feldern und dem ausgewählten Buchstaben.
-// Baut Timeline neu (Wird ausgeführt, bei Click auf Buchstaben-Navigation)
+/**
+ * Aktualisiert die Variablen mit den eingegebenen Werten aus den Filter-Feldern und dem ausgewählten Buchstaben.
+ * Baut Timeline neu (Wird ausgeführt, bei Click auf Buchstaben-Navigation)
+ */
 function charClick() {
     startsWith = event.srcElement.id;
     buildTimeline();
 }
 
-// Aktualisiert die Variablen mit den eingegebenen Werten aus den Filter-Feldern und baut Timeline neu
-// (Wird ausgeführt, bei Click auf "Search!")
+/**
+ * Aktualisiert die Variablen mit den eingegebenen Werten aus den Filter-Feldern und baut Timeline neu
+ * (Wird ausgeführt, bei Click auf "Search!")
+ */
 function getSubmitFields() {
     persons = document.getElementById("PersonInput").value;
     firstdate = document.getElementById("LivedFromInput").value;
@@ -179,9 +187,136 @@ function getSubmitFields() {
     buildTimeline();
 }
 
-// This function is called everytime a row is clicked on.
-// The event will be caught and we'll display all information of that person in the info box to the right.
+/**
+ * This function is called everytime a row is clicked on.
+ * The event will be caught and we'll display all information of that person in the info box to the right.
+ *
+ * @param e
+ */
 function updatePersonalInformationBox(e) {
+    // Erstelle eine Überschrift mit dem Namen der Person
+    let innerHTML = '<h4>' + e.item.get("TITLE") + "</h4>";
+
+    // Füge ein Bild hinzu
+    if (e.item.get("IMAGE") === "NONE") {
+        innerHTML += "<br />";
+        innerHTML += '<img class="img" src="https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png" width="500" height="500">';
+    } else {
+        innerHTML += "<br />";
+        innerHTML += '<img class="img" src="' + e.item.get("IMAGE") + '" width="500" height="500">';
+    }
+
+    // Füge den Wikipedia-Link zur Person hinzu
+    if (e.item.get("LINK") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += '<a href="' + e.item.get("LINK") + '"><h6>Wiki page</h6></a>';
+    }
+
+    // Füge die Kurzbeschreibung hinzu
+    if (e.item.get("SHORT_DESCRIPTION") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += "<b>Short Description</b><br/>";
+        innerHTML += "<span>" + e.item.get("SHORT_DESCRIPTION") + "<span>";
+    }
+
+    // Füge Personeninformationen bzüglich der Geburt hinzu
+    if (e.item.get("BIRTH_DATE") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += "<b>Born</b><br/>";
+        let date = e.item.get("BIRTH_DATE").split("-");
+        innerHTML += "<span>" + dateFormatter(date, true) + "<span>";
+    }
+
+    if (e.item.get("BIRTH_PLACE") !== "NONE") {
+        innerHTML += "<br />";
+        if (e.item.get("BIRTH_DATE") === "NONE") {
+            innerHTML += "<b>Born</b><br/>";
+        }
+        innerHTML += "<span>" + e.item.get("BIRTH_PLACE") + "<span>";
+    }
+
+    // Füge Personeninformationen bzüglich des Todes hinzu
+    if (e.item.get("DEATH_DATE") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += "<b>Died</b><br/>";
+
+        let date = e.item.get("DEATH_DATE").split("-");
+        innerHTML += "<span>" + dateFormatter(date, true) + "<span>";
+    }
+
+    if (e.item.get("DEATH_PLACE") !== "NONE") {
+        innerHTML += "<br />";
+        if (e.item.get("DEATH_DATE") === "NONE") {
+            innerHTML += "<b>Died</b><br/>";
+        }
+        innerHTML += "<span>" + e.item.get("DEATH_PLACE") + "<span>";
+    }
+
+    if (e.item.get("DEATH_CAUSE") !== "NONE") {
+        innerHTML += "<br />";
+        if (e.item.get("DEATH_DATE") === "NONE" && e.item.get("DEATH_PLACE") === "NONE") {
+            innerHTML += "<b>Died</b><br/>";
+        }
+        innerHTML += "<span>" + e.item.get("DEATH_CAUSE") + "<span>";
+    }
+
+    // Füge die Nationalität hinzu
+    if (e.item.get("NATIONALITY") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += "<b>Nationality</b><br/>";
+        innerHTML += "<span>" + e.item.get("NATIONALITY") + "<span>";
+    }
+
+    // Füge Informationen bzüglich der Bekanntheit hinzu
+    if (e.item.get("KNOWN_FOR") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += "<b>Known for</b><br/>";
+        innerHTML += "<span>" + e.item.get("KNOWN_FOR") + "<span>";
+    }
+
+    // Füge Personeninformationen bzüglich des Amts hinzu
+    if (e.item.get("OFFICE") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += "<b>Office</b><br/>";
+
+        if (e.item.get("ORDERS") !== "NONE") {
+            innerHTML += "<span>" + e.item.get("ORDERS") + " <span>";
+        }
+        innerHTML += "<span>" + e.item.get("OFFICE") + "<span>";
+
+        if (e.item.get("TERM_START") !== "NONE") {
+            if (e.item.get("TERM_END") === "NONE") {
+                innerHTML += "<br/>Since ";
+            }
+
+            let date = e.item.get("TERM_START").split("-");
+            innerHTML += "<br/><span>" + dateFormatter(date, false) + "<span>";
+
+            if (e.item.get("TERM_END") !== "NONE") {
+                let date = e.item.get("TERM_END").split("-");
+                innerHTML += "<span> &ndash; " + dateFormatter(date, false) + "<span>";
+            }
+        }
+    }
+
+    // Füge die Tätigkeit bzw. den Beruf hinzu
+    if (e.item.get("OCCUPATION") !== "NONE") {
+        innerHTML += "<br />";
+        innerHTML += "<b>Occupation</b><br/>";
+        innerHTML += "<span>" + e.item.get("OCCUPATION") + "<span>";
+    }
+    document.getElementById("TextDisplay").innerHTML = innerHTML;
+}
+
+/**
+ * Diese Funktion erhält ein Datum aus der Datenbank (AD-1987-03-22)
+ * und gibt ein formatiertes Datum zurück (22 March 1987 AD).
+ *
+ * @param date Das unformatierte Datum aus der Datenbank als Array mit den einzelnen Komponenten.
+ * @param era Ein boolscher Wert. Wenn TRUE, dann wird das Zeitalter mit ausgegeben.
+ * @returns {string} Das formatierte Datum als String
+ */
+function dateFormatter(date, era) {
     const months = [
         'January',
         'February',
@@ -197,81 +332,19 @@ function updatePersonalInformationBox(e) {
         'December'
     ];
 
-    let innerHTML = '<h4>' + e.item.get("TITLE") + "</h4>";
-
-    if (e.item.get("IMAGE") === "NONE") {
-        innerHTML += "<br />";
-        innerHTML += '<img class="img" src="https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png" width="500" height="500">';
+    let newDate;
+    if (date.length === 4) {
+        let month = months[date[2] - 1];
+        newDate = parseInt(date[3]) + " " + month + " " + date[1];
     } else {
-        innerHTML += "<br />";
-        innerHTML += '<img class="img" src="' + e.item.get("IMAGE") + '" width="500" height="500">';
+        newDate = date[1];
     }
 
-    if (e.item.get("LINK") !== "NONE") {
-        innerHTML += "<br />";
-        innerHTML += '<a href="' + e.item.get("LINK") + '"><h6>Wiki page</h6></a>';
+    if (era) {
+        newDate += " " + date[0];
     }
 
-    if (e.item.get("SHORT_DESCRIPTION") !== "NONE") {
-        innerHTML += "<br />";
-        innerHTML += "<b>Short Description</b><br/>";
-        innerHTML += "<span>" + e.item.get("SHORT_DESCRIPTION") + "<span>";
-    }
-
-    if (e.item.get("BIRTH_DATE") !== "NONE") {
-        innerHTML += "<br />";
-        innerHTML += "<b>Born</b><br/>";
-
-        let date = e.item.get("BIRTH_DATE").split("-");
-        let newDate;
-
-        if (date.length === 4) {
-            let month = months[date[2] - 1];
-            newDate = date[3] + " " + month + " " + date[1] + " " + date[0];
-        } else {
-            newDate = date[1] + " " + date[0];
-        }
-        innerHTML += "<span>" + newDate + "<span>";
-    }
-
-    if (e.item.get("BIRTH_PLACE") !== "NONE") {
-        innerHTML += "<br />";
-        if (e.item.get("BIRTH_DATE") === "NONE") {
-            innerHTML += "<b>Born</b><br/>";
-        }
-        innerHTML += "<span>" + e.item.get("BIRTH_PLACE") + "<span>";
-    }
-
-    if (e.item.get("DEATH_DATE") !== "NONE") {
-        innerHTML += "<br />";
-        innerHTML += "<b>Died</b><br/>";
-
-        let date = e.item.get("DEATH_DATE").split("-");
-        let newDate;
-
-        if (date.length === 4) {
-            let month = months[date[2] - 1];
-            newDate = date[3] + " " + month + " " + date[1] + " " + date[0];
-        } else {
-            newDate = date[1] + " " + date[0];
-        }
-        innerHTML += "<span>" + newDate + "<span>";
-    }
-
-    if (e.item.get("DEATH_PLACE") !== "NONE") {
-        innerHTML += "<br />";
-        if (e.item.get("DEATH_DATE") === "NONE") {
-            innerHTML += "<b>Died</b><br/>";
-        }
-        innerHTML += "<span>" + e.item.get("DEATH_PLACE") + "<span>";
-    }
-
-    if (e.item.get("OCCUPATION") !== "NONE") {
-        innerHTML += "<br />";
-        innerHTML += "<b>Occupation</b><br/>";
-        innerHTML += "<span>" + e.item.get("OCCUPATION") + "<span>";
-    }
-    document.getElementById("TextDisplay").innerHTML = innerHTML;
+    return newDate;
 }
 
 
@@ -280,6 +353,7 @@ function updatePersonalInformationBox(e) {
 /**
  * Erstellt den Graphen im "graphContainer"-div
  */
+
 function buildGraph() {
     const container = document.getElementById("graphContainer");
     container.innerHTML = "";
