@@ -74,7 +74,7 @@
         </dependency>
     </dependencies>
 
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <build>
         <!-- <finalName>APP</finalName> -->
         <plugins>
