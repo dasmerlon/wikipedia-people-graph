@@ -5,7 +5,7 @@ The goal of the project is to create a tool to interactively explore the relatio
 
 Everything is based on Wikimedia's regular database dumps of the English Wikipedia, which can be found [here](https://dumps.wikimedia.org/enwiki/).
 
-***TODO:** Screenshots vom Zeitstrahl und Netzgraphen hier*
+![Wikipedia People Graph](https://raw.githubusercontent.com/dasmerlon/images/master/wikipedia-people-graph.png "Wep Application")
 
 # Project Structure
 
