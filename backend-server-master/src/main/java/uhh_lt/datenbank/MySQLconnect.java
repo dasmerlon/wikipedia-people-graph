@@ -111,41 +111,30 @@ public class MySQLconnect {
      */
     public String getPersonData(String person, String birthdate, String deathdate, String job, String startsWith) throws SQLException {
         Statement st = con.createStatement();
+        String sql = "SELECT * FROM PersonData WHERE 1";
 
-        if (person.equals("")) {
-            person = "!=" + "'" + person + "'";
-        } else {
-            person = " LIKE" + "'%" + person + "%'";
+        if (!person.equals("")) {
+            sql += String.format(" AND TITLE LIKE '%%%s%%'", person);
         }
 
         // Geburts und Todesdatum sind in unserer DB leider als String gespeichert, daher können wir keine "Zeitbereiche" eingrenzen...
-        if (birthdate.equals("")) {
-            birthdate = "!=" + "'" + birthdate + "'";
-        } else {
-
-            birthdate = "=" + "'AD-" + birthdate + "'";
+        if (!birthdate.equals("")) {
+            sql += String.format(" AND BIRTH_DATE = 'AD-%s'", birthdate);
         }
 
-        if (deathdate.equals("")) {
-            deathdate = "!=" + "'" + deathdate + "'";
-        } else {
-
-            deathdate = "=" + "'AD-" + deathdate + "'";
+        if (!deathdate.equals("")) {
+            sql += String.format(" AND DEATH_DATE = 'AD-%s'", deathdate);
         }
 
-        if (job.equals("")) {
-            job = "!=" + "'" + job + "'";
-        } else {
-            job = " LIKE" + "'%" + job + "%'";
+        if (!job.equals("")) {
+            sql += String.format(" AND (OCCUPATION = '%%%s%%' OR OFFICE = '%%%s%%')", job, job);
         }
 
-        if (startsWith.equals("")) {
-            startsWith = "!=" + "'" + startsWith + "'";
-        } else {
-            startsWith = " LIKE" + "'" + startsWith + "%'";
+        if (!startsWith.equals("")) {
+            sql += String.format(" AND TITLE LIKE '%s%%'", startsWith);
         }
 
-        String sql = ("SELECT * FROM PersonData WHERE (OCCUPATION" + job + " OR OFFICE" + job + ") AND BIRTH_DATE" + birthdate + " AND DEATH_DATE" + deathdate + " AND (TITLE" + person + " AND TITLE" + startsWith + ") LIMIT 200" + " ;");
+        sql += ";";
 
         ResultSet rs;
         try {

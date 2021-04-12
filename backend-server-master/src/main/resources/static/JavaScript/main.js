@@ -203,7 +203,8 @@ function updatePersonalInformationBox(e) {
         innerHTML += '<img class="img" src="https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png" width="500" height="500">';
     } else {
         innerHTML += "<br />";
-        innerHTML += '<img class="img" src="' + e.item.get("IMAGE") + '" width="500" height="500">';
+        var imageName = e.item.get("IMAGE").substring(52)
+        innerHTML += '<img id="image" class="img" src="https://commons.wikimedia.org/wiki/Special:FilePath/' + imageName + '" width="500" height="500">';
     }
 
     // Füge den Wikipedia-Link zur Person hinzu
@@ -305,7 +306,16 @@ function updatePersonalInformationBox(e) {
         innerHTML += "<b>Occupation</b><br/>";
         innerHTML += "<span>" + e.item.get("OCCUPATION") + "<span>";
     }
-    document.getElementById("TextDisplay").innerHTML = innerHTML;
+    let textDisplay = document.getElementById("TextDisplay");
+    textDisplay.innerHTML = innerHTML;
+
+    // Wenn das Bild nicht richtig angezeigt werden konnte, wird es mit dem Platzhalterbild ersetzt.
+    if (e.item.get("IMAGE") !== "NONE") {
+       let image = textDisplay.querySelector("#image");
+       image.addEventListener("error", function(event){
+            this.src = 'https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png';
+        });
+    }
 }
 
 /**
