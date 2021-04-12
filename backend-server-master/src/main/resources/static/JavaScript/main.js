@@ -203,8 +203,7 @@ function updatePersonalInformationBox(e) {
         innerHTML += '<img class="img" src="https://www.pngitem.com/pimgs/m/99-998739_dale-engen-person-placeholder-hd-png-download.png" width="500" height="500">';
     } else {
         innerHTML += "<br />";
-        var imageName = e.item.get("IMAGE").substring(52)
-        innerHTML += '<img id="image" class="img" src="https://commons.wikimedia.org/wiki/Special:FilePath/' + imageName + '" width="500" height="500">';
+        innerHTML += '<img id="image" class="img" src="' + e.item.get("IMAGE") + '" width="500" height="500">';
     }
 
     // Füge den Wikipedia-Link zur Person hinzu
