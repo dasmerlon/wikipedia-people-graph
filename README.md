@@ -59,7 +59,9 @@ If a link points to that person, a new relationship is created.
 ## Web Server
 
 The website is the interface to the user of this application. We use the spring framework to build the application (spring boot application).\
-The structure and logic of this website is defined in the HTML-, CSS-, JavaScript- and Java-files. 
+The structure and logic of this website is defined in the HTML-, CSS-, JavaScript- and Java-files. \
+The `index.html` file defines the inputs, buttons, infobox and containers for the visualisations. The `main.js` file contains the logic and frameworks to build the timeline and network-graph in the corresponding HTML-containers. To receive the data,the `main.js` needs to display in it's functions `buildTimeline` and `buildGraph`, the functions call one of the Controller-Classes (Java) `PersonController`, `RelatedPersonController` or `GraphController`. The controller-classes get the data from a MySQL-Database using the `MySQLconnect`-class. The `GraphController` additionally brings the SQL-data into the needed structure and gets additional data (for the second layer of relationships). \\
+The `MySQLconnect`-class creates a connection to the MySQL-databases, which is defined in the `credentials.txt`-file. The `MySQLconnect`-class moreover uses the `ResultSetConverter`-class to convert the returned SQL-ResultSet into JSON-Format.
 
 # Installation
 
@@ -77,7 +79,7 @@ There's also a `run_test.sh` file, which can be used for reference on how to exe
 More on this in the section `Deploy and Execution`.
 
 ## Web Server
-
+Before deployment you have to define your credentials for the MySQL-database in the `credentials.txt`-file.
 To be able to deploy the website on a web server, you need to package the project into a file-format, which your webserver expects. We use an Apache Tomcat Server and packaged the project into a WAR-file.
 
 # Deployment and Execution
