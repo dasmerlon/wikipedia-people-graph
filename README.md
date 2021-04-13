@@ -58,8 +58,8 @@ If a link points to that person, a new relationship is created.
 
 ## Web Server
 
-**TODO**
-
+The website is the interface to the user of this application. We use the spring framework to build the application (spring boot application).\
+The structure and logic of this website is defined in the HTML-, CSS-, JavaScript- and Java-files. 
 
 # Installation
 
@@ -78,7 +78,7 @@ More on this in the section `Deploy and Execution`.
 
 ## Web Server
 
-**TODO**
+To be able to deploy the website on a web server, you need to package the project into a file-format, which your webserver expects. We use an Apache Tomcat Server and packaged the project into a WAR-file.
 
 # Deployment and Execution
 
@@ -190,4 +190,4 @@ The database has been populated and is ready for use.
 
 ## Web Server
 
-**TODO**
+To deploy the website on a web server, you need to upload your packaged file (in our deployment the WAR-file) to your web server and instruct your web server to deploy the website.  We use an Apache Tomcat Server to host the website. 
