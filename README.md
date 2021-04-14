@@ -58,10 +58,12 @@ If a link points to that person, a new relationship is created.
 
 ## Web Server
 
-The website is the interface to the user of this application. We use the spring framework to build the application (spring boot application).\
-The structure and logic of this website is defined in the HTML-, CSS-, JavaScript- and Java-files. \
-The `index.html` file defines the inputs, buttons, infobox and containers for the visualisations. The `main.js` file contains the logic and frameworks to build the timeline and network-graph in the corresponding HTML-containers. To receive the data,the `main.js` needs to display in it's functions `buildTimeline` and `buildGraph`, the functions call one of the Controller-Classes (Java) `PersonController`, `RelatedPersonController` or `GraphController`. The controller-classes get the data from a MySQL-Database using the `MySQLconnect`-class. The `GraphController` additionally brings the SQL-data into the needed structure and gets additional data (for the second layer of relationships). \\
-The `MySQLconnect`-class creates a connection to the MySQL-databases, which is defined in the `credentials.txt`-file. The `MySQLconnect`-class moreover uses the `ResultSetConverter`-class to convert the returned SQL-ResultSet into JSON-Format.
+The website provides the user interface of this application. We use the spring framework to build the web application (spring boot application).\
+The structure and logic of this website is defined in the HTML-, CSS-, JavaScript- and Java-code. 
+
+The `index.html` file defines the inputs, buttons, infobox and containers for both visualisations. The `main.js` file contains the logic to build the timeline and network-graph in the corresponding HTML-containers. We use the AnyChart library to build the visualisations. To receive the data, `main.js` needs to display in it's functions `buildTimeline` and `buildGraph`, the functions call one of the Controller-classes (Java) `PersonController`, `RelatedPersonController` or `GraphController`. The controller-classes get the data from a MySQL-Database using the `MySQLconnect`-class. The `GraphController` additionally converts the data into the needed structure and gets additional data (for the second layer of relationships). 
+
+The `MySQLconnect`-class creates a connection to the MySQL-database, which is defined in the `credentials.txt`-file. The `MySQLconnect`-class moreover uses the `ResultSetConverter`-class to convert the returned SQL-ResultSet into JSON-Format.
 
 # Installation
 
@@ -80,7 +82,7 @@ More on this in the section `Deploy and Execution`.
 
 ## Web Server
 Before deployment you have to define your credentials for the MySQL-database in the `credentials.txt`-file.
-To be able to deploy the website on a web server, you need to package the project into a file-format, which your webserver expects. We use an Apache Tomcat Server and packaged the project into a WAR-file.
+To be able to deploy the website on a web server, you need to package the project into a file-format your webserver expects. We use an Apache Tomcat Server and packaged the project into a WAR-file.
 
 # Deployment and Execution
 
@@ -192,4 +194,4 @@ The database has been populated and is ready for use.
 
 ## Web Server
 
-To deploy the website on a web server, you need to upload your packaged file (in our deployment the WAR-file) to your web server and instruct your web server to deploy the website.  We use an Apache Tomcat Server to host the website. 
+To deploy the website on a web server, you need to upload your packaged file (in our deployment a WAR-file) to your web server and instruct your web server to deploy the website. We use an Apache Tomcat Server to host the website. 
