@@ -81,8 +81,13 @@ There's also a `run_test.sh` file, which can be used for reference on how to exe
 More on this in the section `Deploy and Execution`.
 
 ## Web Server
-Before deployment you have to define your credentials for the MySQL-database in the `credentials.txt`-file.
-To be able to deploy the website on a web server, you need to package the project into a file-format your webserver expects. We use an Apache Tomcat Server and packaged the project into a WAR-file.
+Before deployment, you have to define your credentials for the MySQL-database.
+To be able to deploy the website on a web server, you need to package the project 
+into a file-format your webserver expects. We use an Apache Tomcat Server and 
+packaged the project into a WAR-file.
+
+1. Copy the `credentials.txt.template` from the folder `backend-server-master`, adjust your login data and move it to `backend-server-master/src/main/resources/credentials.txt`.
+2. Run and build the project with maven to get the WAR-file.
 
 # Deployment and Execution
 
