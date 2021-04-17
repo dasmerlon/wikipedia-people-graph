@@ -13,8 +13,8 @@ Click [here](http://basecamp-demos.informatik.uni-hamburg.de:8080/peoplegraph/) 
 
 The whole project is divided into two subprojects.
 
-1. Hadoop Jobs, which extract all necessary and interesting information from the Wikimedia dumps. *(Merle Hoffmann)*
-2. A web server, for interactive exploration. *(LeHenningo, blackstarrising, TheHinoki)*
+1. Hadoop Jobs, which extract all necessary and interesting information from the Wikimedia dumps. 
+2. A web server, for interactive exploration. 
 
 ## Hadoop Jobs
 
